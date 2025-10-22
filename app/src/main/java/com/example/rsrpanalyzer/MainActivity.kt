@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
+import com.kakao.vectormap.KakaoMapSdk
 import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapView
 import com.kakao.vectormap.camera.CameraPosition
@@ -26,6 +27,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+        KakaoMapSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
+        mapView = findViewById(R.id.map_view) // ✅ view 찾기
+
         // 권한 확인 및 요청
         val checkSelfPermission = ContextCompat.checkSelfPermission(
             this, Manifest.permission.ACCESS_FINE_LOCATION
@@ -77,12 +83,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("Location", "현재 위치: $lat, $lon")
 
                 val position = CameraPosition.from(
-                    lat,
-                    lon,
-                    16,
-                    0.0,
-                    0.0,
-                    0.0
+                    lat, lon, 16, 0.0, 0.0, 0.0
                 )
                 val cameraUpdate = CameraUpdateFactory.newCameraPosition(position)
 
