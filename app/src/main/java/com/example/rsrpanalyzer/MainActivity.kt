@@ -28,13 +28,19 @@ import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapView
 import com.kakao.vectormap.camera.CameraPosition
 import com.kakao.vectormap.camera.CameraUpdateFactory
+import com.kakao.vectormap.LatLng
+import com.kakao.vectormap.label.LabelOptions
+import com.kakao.vectormap.label.LabelStyle
+import com.kakao.vectormap.label.LabelStyles
 import com.kakao.vectormap.label.Label
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var locationRequest: LocationRequest
     private lateinit var mapView: MapView
     private var kakaoMap: KakaoMap? = null
     private var centerLabel: Label? = null
+    private var centerLabelStyles: LabelStyles? = null
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var locationCallback: LocationCallback? = null
@@ -51,7 +57,8 @@ class MainActivity : AppCompatActivity() {
         mapView = findViewById(R.id.map_view)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000L)
+            .setMinUpdateIntervalMillis(500L).build()
 
         if (hasLocationPermission()) {
             initMap()
@@ -112,8 +119,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000L)
-            .setMinUpdateIntervalMillis(500L).build()
         val settingsRequest =
             LocationSettingsRequest.Builder().addLocationRequest(locationRequest).build()
         val settingsClient = LocationServices.getSettingsClient(this)
@@ -141,6 +146,50 @@ class MainActivity : AppCompatActivity() {
 
         runOnUiThread {
             kakaoMap?.moveCamera(update)
+            updateUserLabel(location)
+        }
+    }
+
+    private fun updateUserLabel(location: Location) {
+        val map = kakaoMap ?: return
+        val labelManager = map.labelManager ?: return
+        val layer = labelManager.layer ?: return
+
+        // Remove previous label (we'll re-add) to ensure position update works
+        centerLabel?.let { old ->
+            try {
+                layer.remove(old)
+            } catch (_: Exception) {
+            }
+            centerLabel = null
+        }
+
+        // Ensure styles exist. addLabelStyles returns an object used by LabelOptions.setStyles
+        if (centerLabelStyles == null) {
+            try {
+                // addLabelStyles should return a LabelStyles instance
+                centerLabelStyles = labelManager.addLabelStyles(
+                    LabelStyles.from(LabelStyle.from(android.R.drawable.ic_menu_mylocation))
+                )
+            } catch (e: Exception) {
+                Log.w("KakaoMap", "Label style creation failed: ${e.message}")
+                centerLabelStyles = null
+            }
+        }
+
+        val optionsBuilder = LabelOptions.from(LatLng.from(location.latitude, location.longitude))
+        val options = if (centerLabelStyles != null) {
+            optionsBuilder.setStyles(centerLabelStyles!!)
+        } else optionsBuilder
+
+        val newLabel = layer.addLabel(options)
+        centerLabel = newLabel
+
+        // Start tracking this label so the map keeps it centered (if TrackingManager available)
+        try {
+            map.trackingManager?.startTracking(centerLabel)
+        } catch (e: Exception) {
+            Log.w("KakaoMap", "Tracking start failed: ${e.message}")
         }
     }
 
