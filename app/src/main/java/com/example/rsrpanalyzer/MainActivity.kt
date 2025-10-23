@@ -1,15 +1,26 @@
 package com.example.rsrpanalyzer
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.Priority
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.KakaoMapSdk
@@ -17,31 +28,64 @@ import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapView
 import com.kakao.vectormap.camera.CameraPosition
 import com.kakao.vectormap.camera.CameraUpdateFactory
+import com.kakao.vectormap.label.Label
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var locationManager: LocationManager
     private lateinit var mapView: MapView
     private var kakaoMap: KakaoMap? = null
+    private var centerLabel: Label? = null
+
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var locationCallback: LocationCallback? = null
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 100
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         KakaoMapSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
-        mapView = findViewById(R.id.map_view) // ✅ view 찾기
+        mapView = findViewById(R.id.map_view)
 
-        // 권한 확인 및 요청
-        val checkSelfPermission = ContextCompat.checkSelfPermission(
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
+
+        if (hasLocationPermission()) {
+            initMap()
+        } else {
+            requestLocationPermission()
+        }
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        val fine = ContextCompat.checkSelfPermission(
             this, Manifest.permission.ACCESS_FINE_LOCATION
         )
-        if (checkSelfPermission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100
-            )
-        } else {
+        val coarse = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+        return fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestLocationPermission() {
+        ActivityCompat.requestPermissions(
+            this, arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
+            ), LOCATION_PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
             initMap()
+        } else {
+            Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -57,45 +101,75 @@ class MainActivity : AppCompatActivity() {
         }, object : KakaoMapReadyCallback() {
             override fun onMapReady(map: KakaoMap) {
                 kakaoMap = map
-                Log.d("KakaoMap", "Map ready")
-                showCurrentLocation()
+                locationUpdates()
             }
         })
     }
 
-    private fun showCurrentLocation() {
-        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-
-        if (ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            Log.w("Location", "위치 권한이 허용되지 않음")
+    @SuppressLint("MissingPermission")
+    private fun locationUpdates() {
+        if (!hasLocationPermission()) {
             return
         }
 
-        val listener = object : LocationListener {
-            override fun onLocationChanged(location: Location) {
-                val lat = location.latitude
-                val lon = location.longitude
-                Log.d("Location", "현재 위치: $lat, $lon")
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000L)
+            .setMinUpdateIntervalMillis(500L).build()
+        val settingsRequest =
+            LocationSettingsRequest.Builder().addLocationRequest(locationRequest).build()
+        val settingsClient = LocationServices.getSettingsClient(this)
 
-                val position = CameraPosition.from(
-                    lat, lon, 16, 0.0, 0.0, 0.0
-                )
-                val cameraUpdate = CameraUpdateFactory.newCameraPosition(position)
+        settingsClient.checkLocationSettings(settingsRequest)
+            .addOnFailureListener { showLocationSettingsAlert() }
 
-                kakaoMap?.moveCamera(cameraUpdate)
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                result.lastLocation?.let { updateMapCamera(it) }
             }
-
-            override fun onProviderEnabled(provider: String) {}
-            override fun onProviderDisabled(provider: String) {}
         }
 
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER, 2000L, 1f, listener
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest, locationCallback!!, Looper.getMainLooper()
         )
+        Log.d("Location", "위치 업데이트 요청 시작")
+    }
+
+    private fun updateMapCamera(location: Location) {
+        val position = CameraPosition.from(
+            location.latitude, location.longitude, 16, 0.0, 0.0, 0.0
+        )
+        val update = CameraUpdateFactory.newCameraPosition(position)
+
+        runOnUiThread {
+            kakaoMap?.moveCamera(update)
+        }
+    }
+
+    private fun showLocationSettingsAlert() {
+        AlertDialog.Builder(this).setTitle("위치 서비스 비활성화")
+            .setMessage("위치 서비스가 꺼져 있습니다.\n\n1. 설정 → 위치 → 위치 사용 ON\n2. 또는 위치 모드를 '정확도 높음'으로 변경하세요.")
+            .setPositiveButton("설정으로 이동") { _, _ ->
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }.setNegativeButton("취소", null).show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (hasLocationPermission()) locationUpdates()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopLocationUpdates()
+    }
+
+    private fun stopLocationUpdates() {
+        locationCallback?.let {
+            fusedLocationProviderClient.removeLocationUpdates(it)
+        }
     }
 }
