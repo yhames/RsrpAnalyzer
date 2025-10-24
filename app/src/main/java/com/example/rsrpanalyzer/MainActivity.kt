@@ -203,7 +203,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (hasLocationPermission()) locationUpdates()
+        if (hasLocationPermission()) {
+            locationUpdates()
+        }
     }
 
     override fun onPause() {
