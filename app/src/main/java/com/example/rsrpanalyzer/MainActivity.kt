@@ -44,6 +44,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var locationCallback: LocationCallback? = null
+    private val requiredPermissions = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
+    )
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 100
@@ -60,10 +63,10 @@ class MainActivity : AppCompatActivity() {
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000L)
             .setMinUpdateIntervalMillis(500L).build()
 
-        if (hasLocationPermission()) {
-            initMap()
-        } else {
+        if (!hasLocationPermission()) {
             requestLocationPermission()
+        } else {
+            initMap()
         }
     }
 
@@ -79,9 +82,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestLocationPermission() {
         ActivityCompat.requestPermissions(
-            this, arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
-            ), LOCATION_PERMISSION_REQUEST_CODE
+            this, requiredPermissions, LOCATION_PERMISSION_REQUEST_CODE
         )
     }
 
