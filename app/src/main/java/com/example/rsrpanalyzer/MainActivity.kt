@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         }
         viewModel.rsrp.observe(this) { rsrp ->
             tvRsrp.text = "RSRP: $rsrp dBm"
+            mapController.updateSignalStrength(rsrp)
         }
         viewModel.rsrq.observe(this) { rsrq ->
             tvRsrq.text = "RSRQ: $rsrq dB"
