@@ -24,9 +24,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField(
-            "String",
-            "KAKAO_NATIVE_APP_KEY",
-            "${properties["KAKAO_NATIVE_APP_KEY"]}"
+            "String", "KAKAO_NATIVE_APP_KEY", "${properties["KAKAO_NATIVE_APP_KEY"]}"
         )
     }
 
@@ -34,8 +32,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -59,9 +56,18 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Kotlin extensions for lifecycle viewmodel
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    // Kakao Map
     implementation(libs.kakao.maps.android)
+
+    // Fused Location
+    implementation(libs.play.services.location)
+
 }
