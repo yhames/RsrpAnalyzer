@@ -1,5 +1,6 @@
 package com.example.rsrpanalyzer
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -20,7 +21,7 @@ import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
 import java.util.concurrent.atomic.AtomicInteger
 
-class MapController(private val mapView: MapView) {
+class MapController(private val context: Context, private val mapView: MapView) {
     private var kakaoMap: KakaoMap? = null
     private var labelManager: LabelManager? = null
     private var labelLayer: LabelLayer? = null
@@ -33,8 +34,8 @@ class MapController(private val mapView: MapView) {
                 Log.d("MapController", "Map destroyed")
             }
 
-            override fun onMapError(p0: Exception?) {
-                Log.e("MapController", "Map error: ${p0?.message}")
+            override fun onMapError(error: Exception?) {
+                Log.e("MapController", "Map error: ${error?.message}")
             }
 
         }, object : KakaoMapReadyCallback() {
@@ -42,7 +43,7 @@ class MapController(private val mapView: MapView) {
                 kakaoMap = map
                 labelManager = map.labelManager
                 labelLayer = map.labelManager?.layer
-                Log.d("MapController", "Map ready - applying pending data")
+                Log.d("MapController", "Map ready")
             }
         })
     }
@@ -57,25 +58,22 @@ class MapController(private val mapView: MapView) {
         val layer = labelLayer ?: return
         val manager = labelManager ?: return
 
+        // Create or update positionLabel
         val position = LatLng.from(location.latitude, location.longitude)
+        val styles = manager.addLabelStyles(LabelStyles.from(createRsrpLabelStyle()))
         if (positionLabel == null) {
-            Log.d("MapController", "Creating new position label")
-
-            val color = SignalStrengthHelper.getRsrpLevel(currentRsrp.get()).color
-            val bitmap = createColoredCircleBitmap(color, 40)
-            val style = LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
-            val styles = manager.addLabelStyles(LabelStyles.from(style))
             val options = LabelOptions.from("user", position).setStyles(styles)
             positionLabel = layer.addLabel(options)
-
-            Log.d("MapController", "Label created")
+            Log.d("MapController", "positionLabel created: position=$position")
         } else {
-            positionLabel?.changeStyles(LabelStyles.from(createRsrpLabelStyle()))
+            positionLabel?.changeStyles(styles)
             positionLabel?.moveTo(position)
+            Log.d("MapController", "positionLabel updated: position=$position")
         }
 
         val cameraUpdate = CameraUpdateFactory.newCenterPosition(position)
         map.moveCamera(cameraUpdate)
+        Log.d("MapController", "Camera moved to $position")
     }
 
 
@@ -89,7 +87,8 @@ class MapController(private val mapView: MapView) {
 
         positionLabel?.let { label ->
             try {
-                label.changeStyles(LabelStyles.from(createRsrpLabelStyle()))
+                val styles = LabelStyles.from(createRsrpLabelStyle())
+                label.changeStyles(styles)
                 Log.d("MapController", "Signal strength updated: RSRP=$rsrp")
             } catch (e: Exception) {
                 Log.e("MapController", "Error updating signal strength", e)
@@ -101,7 +100,8 @@ class MapController(private val mapView: MapView) {
      * @return currentRsrp에 해당하는 LabelStyle
      */
     private fun createRsrpLabelStyle(): LabelStyle {
-        val color = SignalStrengthHelper.getRsrpLevel(currentRsrp.get()).color
+        val rsrpLevel = SignalStrengthHelper.getRsrpLevel(currentRsrp.get())
+        val color = context.getColor(rsrpLevel.color)
         val bitmap = createColoredCircleBitmap(color, 40)
         return LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
     }

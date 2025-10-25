@@ -2,4 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="signal_excellent">#FF00C851</color>
+    <color name="signal_good">#FF7CB342</color>
+    <color name="signal_fair">#FFFFB300</color>
+    <color name="signal_poor">#FFFF6F00</color>
+    <color name="signal_very_poor">#FFF44336</color>
+    <color name="signal_no_signal">#FF808080</color>
 </resources>

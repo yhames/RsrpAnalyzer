@@ -1,7 +1,5 @@
 package com.example.rsrpanalyzer
 
-import androidx.core.graphics.toColorInt
-
 object SignalStrengthHelper {
 
     private const val RSRP_EXCELLENT = -80
@@ -17,12 +15,12 @@ object SignalStrengthHelper {
     private const val RSRQ_VERY_POOR = -19
 
     enum class SignalLevel(val level: Int, val labelResourceId: Int, val color: Int) {
-        EXCELLENT(5, R.string.signal_excellent, "#00C851".toColorInt()),  // Green
-        GOOD(4, R.string.signal_good, "#7CB342".toColorInt()),            // Light Green
-        FAIR(3, R.string.signal_fair, "#FFB300".toColorInt()),            // Amber
-        POOR(2, R.string.signal_poor, "#FF6F00".toColorInt()),            // Orange
-        VERY_POOR(1, R.string.signal_very_poor, "#F44336".toColorInt()),  // Red
-        NO_SIGNAL(0, R.string.signal_no_signal, "#FF8080".toColorInt())   // Black
+        EXCELLENT(5, R.string.signal_excellent, R.color.signal_excellent),
+        GOOD(4, R.string.signal_good, R.color.signal_good),
+        FAIR(3, R.string.signal_fair, R.color.signal_fair),
+        POOR(2, R.string.signal_poor, R.color.signal_poor),
+        VERY_POOR(1, R.string.signal_very_poor, R.color.signal_very_poor),
+        NO_SIGNAL(0, R.string.signal_no_signal, R.color.signal_no_signal)
     }
 
     fun getSignalLevel(rsrp: Int, rsrq: Int): SignalLevel {

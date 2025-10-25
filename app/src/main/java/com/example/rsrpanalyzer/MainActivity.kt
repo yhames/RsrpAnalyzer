@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         KakaoMapSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
 
-        mapController = MapController(mapView)
+        mapController = MapController(this, mapView)
         locationTracker = LocationTracker(this)
         signalMonitor = SignalMonitor(this)
 
