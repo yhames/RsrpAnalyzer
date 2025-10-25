@@ -27,6 +27,7 @@ class MapController(private val context: Context, private val mapView: MapView) 
     private var labelLayer: LabelLayer? = null
     private var positionLabel: Label? = null
     private val currentRsrp = AtomicInteger(Int.MIN_VALUE)
+    private val bitmapCache = mutableMapOf<Int, Bitmap>()
 
     fun init() {
         mapView.start(object : MapLifeCycleCallback() {
@@ -102,7 +103,9 @@ class MapController(private val context: Context, private val mapView: MapView) 
     private fun createRsrpLabelStyle(): LabelStyle {
         val rsrpLevel = SignalStrengthHelper.getRsrpLevel(currentRsrp.get())
         val color = context.getColor(rsrpLevel.color)
-        val bitmap = createColoredCircleBitmap(color, 40)
+        val bitmap = bitmapCache.getOrPut(color) {
+            createColoredCircleBitmap(color, 40)
+        }
         return LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
     }
 
