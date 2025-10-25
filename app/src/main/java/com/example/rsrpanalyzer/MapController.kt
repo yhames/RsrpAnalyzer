@@ -5,16 +5,19 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.location.Location
 import android.util.Log
-import com.kakao.vectormap.*
+import androidx.core.graphics.createBitmap
+import com.kakao.vectormap.KakaoMap
+import com.kakao.vectormap.KakaoMapReadyCallback
+import com.kakao.vectormap.LatLng
+import com.kakao.vectormap.MapLifeCycleCallback
+import com.kakao.vectormap.MapView
 import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.Label
 import com.kakao.vectormap.label.LabelLayer
+import com.kakao.vectormap.label.LabelManager
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
-import java.lang.Exception
-import androidx.core.graphics.createBitmap
-import com.kakao.vectormap.label.LabelManager
 import java.util.concurrent.atomic.AtomicInteger
 
 class MapController(private val mapView: MapView) {

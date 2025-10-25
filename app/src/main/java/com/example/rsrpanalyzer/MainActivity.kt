@@ -31,9 +31,13 @@ class MainActivity : AppCompatActivity() {
 
     private val permissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val allGranted = permissions.values.all { it }
-            if (allGranted) startTracking()
-            else Toast.makeText(this, "필수 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show()
+            if (!permissions.values.all { it }) {
+                startTracking()
+            } else {
+                Toast.makeText(
+                    this, this.getString(R.string.permission_denied), Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {

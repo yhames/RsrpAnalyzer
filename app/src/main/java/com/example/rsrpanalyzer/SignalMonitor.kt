@@ -2,9 +2,11 @@ package com.example.rsrpanalyzer
 
 import android.content.Context
 import android.os.Build
-import android.telephony.*
+import android.telephony.CellInfo
+import android.telephony.CellInfoLte
+import android.telephony.TelephonyCallback
+import android.telephony.TelephonyManager
 import android.util.Log
-import android.widget.Toast
 
 class SignalMonitor(private val context: Context) {
 
