@@ -9,7 +9,8 @@ object SignalStrengthHelper {
         GOOD("좋음", "#7CB342".toColorInt()),           // Light Green
         FAIR("보통", "#FFB300".toColorInt()),           // Amber
         POOR("나쁨", "#FF6F00".toColorInt()),           // Orange
-        VERY_POOR("매우 나쁨", "#F44336".toColorInt())   // Red
+        VERY_POOR("매우 나쁨", "#F44336".toColorInt()),  // Red
+        NO_SIGNAL("신호 없음", "#FF8080".toColorInt())   // Black
     }
 
     /**
@@ -27,7 +28,8 @@ object SignalStrengthHelper {
             rsrp >= -90 -> SignalLevel.GOOD
             rsrp >= -100 -> SignalLevel.FAIR
             rsrp >= -110 -> SignalLevel.POOR
-            else -> SignalLevel.VERY_POOR
+            rsrp >= -140 -> SignalLevel.VERY_POOR
+            else -> SignalLevel.NO_SIGNAL
         }
     }
 

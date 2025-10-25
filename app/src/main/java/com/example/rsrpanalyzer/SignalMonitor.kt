@@ -3,6 +3,8 @@ package com.example.rsrpanalyzer
 import android.content.Context
 import android.os.Build
 import android.telephony.*
+import android.util.Log
+import android.widget.Toast
 
 class SignalMonitor(private val context: Context) {
 
@@ -26,7 +28,8 @@ class SignalMonitor(private val context: Context) {
             }
             telephonyManager.registerTelephonyCallback(context.mainExecutor, callback!!)
         } else {
-            // TODO: 하위버전 처리
+            Log.w("SignalMonitor", "Requires Android 12 or higher.")
+            TODO("Implement fallback for Android < 12")
         }
     }
 
