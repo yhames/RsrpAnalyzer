@@ -16,13 +16,13 @@ object SignalStrengthHelper {
     private const val RSRQ_POOR = -16
     private const val RSRQ_VERY_POOR = -19
 
-    enum class SignalLevel(val level: Int, val label: String, val color: Int) {
-        EXCELLENT(5, "매우 좋음", "#00C851".toColorInt()),  // Green
-        GOOD(4, "좋음", "#7CB342".toColorInt()),           // Light Green
-        FAIR(3, "보통", "#FFB300".toColorInt()),           // Amber
-        POOR(2, "나쁨", "#FF6F00".toColorInt()),           // Orange
-        VERY_POOR(1, "매우 나쁨", "#F44336".toColorInt()),  // Red
-        NO_SIGNAL(0, "신호 없음", "#FF8080".toColorInt())   // Black
+    enum class SignalLevel(val level: Int, val labelResourceId: Int, val color: Int) {
+        EXCELLENT(5, R.string.signal_excellent, "#00C851".toColorInt()),  // Green
+        GOOD(4, R.string.signal_good, "#7CB342".toColorInt()),            // Light Green
+        FAIR(3, R.string.signal_fair, "#FFB300".toColorInt()),            // Amber
+        POOR(2, R.string.signal_poor, "#FF6F00".toColorInt()),            // Orange
+        VERY_POOR(1, R.string.signal_very_poor, "#F44336".toColorInt()),  // Red
+        NO_SIGNAL(0, R.string.signal_no_signal, "#FF8080".toColorInt())   // Black
     }
 
     fun getSignalLevel(rsrp: Int, rsrq: Int): SignalLevel {

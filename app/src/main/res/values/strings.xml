@@ -1,8 +1,16 @@
 <resources>
     <string name="app_name">RsrpAnalyzer</string>
-    <string name="signal_measuring_status">신호 측정 중…</string>
+
     <string name="rsrp_value_placeholder">RSRP: — dBm</string>
     <string name="rsrq_value_placeholder">RSRQ: — dB</string>
     <string name="rsrp_value">RSRP: %d dBm (%s)</string>
     <string name="rsrq_value">RSRQ: %d dB (%s)</string>
+
+    <string name="signal_measuring_status">신호 측정 중…</string>
+    <string name="signal_excellent">매우 좋음</string>
+    <string name="signal_good">좋음</string>
+    <string name="signal_fair">보통</string>
+    <string name="signal_poor">나쁨</string>
+    <string name="signal_very_poor">매우 나쁨</string>
+    <string name="signal_no_signal">신호 없음</string>
 </resources>
