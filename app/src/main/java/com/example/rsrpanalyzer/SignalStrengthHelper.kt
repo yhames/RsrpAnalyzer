@@ -4,13 +4,32 @@ import androidx.core.graphics.toColorInt
 
 object SignalStrengthHelper {
 
-    enum class SignalLevel(val label: String, val color: Int) {
-        EXCELLENT("매우 좋음", "#00C851".toColorInt()),  // Green
-        GOOD("좋음", "#7CB342".toColorInt()),           // Light Green
-        FAIR("보통", "#FFB300".toColorInt()),           // Amber
-        POOR("나쁨", "#FF6F00".toColorInt()),           // Orange
-        VERY_POOR("매우 나쁨", "#F44336".toColorInt()),  // Red
-        NO_SIGNAL("신호 없음", "#FF8080".toColorInt())   // Black
+    private const val RSRP_EXCELLENT = -80
+    private const val RSRP_GOOD = -90
+    private const val RSRP_FAIR = -100
+    private const val RSRP_POOR = -110
+    private const val RSRP_VERY_POOR = -120
+
+    private const val RSRQ_EXCELLENT = -3
+    private const val RSRQ_GOOD = -8
+    private const val RSRQ_FAIR = -12
+    private const val RSRQ_POOR = -16
+    private const val RSRQ_VERY_POOR = -19
+
+    enum class SignalLevel(val level: Int, val label: String, val color: Int) {
+        EXCELLENT(5, "매우 좋음", "#00C851".toColorInt()),  // Green
+        GOOD(4, "좋음", "#7CB342".toColorInt()),           // Light Green
+        FAIR(3, "보통", "#FFB300".toColorInt()),           // Amber
+        POOR(2, "나쁨", "#FF6F00".toColorInt()),           // Orange
+        VERY_POOR(1, "매우 나쁨", "#F44336".toColorInt()),  // Red
+        NO_SIGNAL(0, "신호 없음", "#FF8080".toColorInt())   // Black
+    }
+
+    fun getSignalLevel(rsrp: Int, rsrq: Int): SignalLevel {
+        val rsrpLevel = getRsrpLevel(rsrp)
+        val rsrqLevel = getRsrqLevel(rsrq)
+        // 둘 중 낮은 레벨을 선택
+        return if (rsrpLevel.level < rsrqLevel.level) rsrpLevel else rsrqLevel
     }
 
     /**
@@ -20,30 +39,36 @@ object SignalStrengthHelper {
      * >= -90 dBm: 좋음
      * >= -100 dBm: 보통
      * >= -110 dBm: 나쁨
-     * < -110 dBm: 매우 나쁨
+     * < -120 dBm: 매우 나쁨
      */
-    fun getSignalLevel(rsrp: Int): SignalLevel {
+    fun getRsrpLevel(rsrp: Int): SignalLevel {
         return when {
-            rsrp >= -80 -> SignalLevel.EXCELLENT
-            rsrp >= -90 -> SignalLevel.GOOD
-            rsrp >= -100 -> SignalLevel.FAIR
-            rsrp >= -110 -> SignalLevel.POOR
-            rsrp >= -140 -> SignalLevel.VERY_POOR
+            rsrp >= RSRP_EXCELLENT -> SignalLevel.EXCELLENT
+            rsrp >= RSRP_GOOD -> SignalLevel.GOOD
+            rsrp >= RSRP_FAIR -> SignalLevel.FAIR
+            rsrp >= RSRP_POOR -> SignalLevel.POOR
+            rsrp >= RSRP_VERY_POOR -> SignalLevel.VERY_POOR
             else -> SignalLevel.NO_SIGNAL
         }
     }
 
     /**
-     * RSRP 값에 따른 색상 반환
+     * RSRQ 값에 따른 신호 강도 레벨 반환
+     * RSRQ (Reference Signal Received Quality) 기준:
+     * >= -3 dB: 매우 좋음
+     * >= -8 dB: 좋음
+     * >= -12 dB: 보통
+     * >= -16 dB: 나쁨
+     * < -19 dB: 매우 나쁨
      */
-    fun getColorForRsrp(rsrp: Int): Int {
-        return getSignalLevel(rsrp).color
-    }
-
-    /**
-     * RSRP 값에 따른 레벨 설명 반환
-     */
-    fun getLabelForRsrp(rsrp: Int): String {
-        return getSignalLevel(rsrp).label
+    fun getRsrqLevel(rsrq: Int): SignalLevel {
+        return when {
+            rsrq >= RSRQ_EXCELLENT -> SignalLevel.EXCELLENT
+            rsrq >= RSRQ_GOOD -> SignalLevel.GOOD
+            rsrq >= RSRQ_FAIR -> SignalLevel.FAIR
+            rsrq >= RSRQ_POOR -> SignalLevel.POOR
+            rsrq >= RSRQ_VERY_POOR -> SignalLevel.VERY_POOR
+            else -> SignalLevel.NO_SIGNAL
+        }
     }
 }

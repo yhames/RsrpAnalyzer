@@ -83,11 +83,13 @@ class MainActivity : AppCompatActivity() {
             mapController.updateLocation(loc)
         }
         viewModel.rsrp.observe(this) { rsrp ->
-            tvRsrp.text = "RSRP: $rsrp dBm"
+            val rsrpLevel = SignalStrengthHelper.getRsrpLevel(rsrp)
+            tvRsrp.text = getString(R.string.rsrp_value, rsrp, rsrpLevel.label)
             mapController.updateSignalStrength(rsrp)
         }
         viewModel.rsrq.observe(this) { rsrq ->
-            tvRsrq.text = "RSRQ: $rsrq dB"
+            val rsrqLevel = SignalStrengthHelper.getRsrqLevel(rsrq)
+            tvRsrq.text = getString(R.string.rsrq_value, rsrq, rsrqLevel.label)
         }
     }
 

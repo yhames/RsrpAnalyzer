@@ -58,7 +58,7 @@ class MapController(private val mapView: MapView) {
         if (positionLabel == null) {
             Log.d("MapController", "Creating new position label")
 
-            val color = SignalStrengthHelper.getColorForRsrp(currentRsrp.get())
+            val color = SignalStrengthHelper.getRsrpLevel(currentRsrp.get()).color
             val bitmap = createColoredCircleBitmap(color, 40)
             val style = LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
             val styles = manager.addLabelStyles(LabelStyles.from(style))
@@ -98,7 +98,7 @@ class MapController(private val mapView: MapView) {
      * @return currentRsrp에 해당하는 LabelStyle
      */
     private fun createRsrpLabelStyle(): LabelStyle {
-        val color = SignalStrengthHelper.getColorForRsrp(currentRsrp.get())
+        val color = SignalStrengthHelper.getRsrpLevel(currentRsrp.get()).color
         val bitmap = createColoredCircleBitmap(color, 40)
         return LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
     }

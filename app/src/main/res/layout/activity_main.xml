@@ -29,7 +29,7 @@
             android:id="@+id/tv_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="신호 측정 중..."
+            android:text="@string/signal_measuring_status"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -39,7 +39,7 @@
             android:id="@+id/tv_rsrp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="RSRP: -- dBm"
+            android:text="@string/rsrp_value_placeholder"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:layout_marginBottom="4dp" />
@@ -48,7 +48,7 @@
             android:id="@+id/tv_rsrq"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="RSRQ: -- dB"
+            android:text="@string/rsrq_value_placeholder"
             android:textColor="#FFFFFF"
             android:textSize="18sp" />
 
