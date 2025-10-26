@@ -20,8 +20,7 @@ import androidx.room.PrimaryKey
 data class SignalRecordEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val sessionId: Long,
-    val startTimestampMillis: Long,     // epoch millis
-    val endTimestampMillis: Long,       // epoch millis
+    val timestampMillis: Long,     // epoch millis, ex) 1761481296731 == 2025-10-26T12:22:24+00:00
     val latitude: Double,
     val longitude: Double,
     val rsrp: Int,
