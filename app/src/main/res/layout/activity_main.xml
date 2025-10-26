@@ -17,32 +17,32 @@
         android:id="@+id/signal_panel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_margin="16dp"
         android:background="#CC000000"
+        android:orientation="vertical"
         android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/tv_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="@string/signal_measuring_status"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tv_rsrp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
             android:text="@string/rsrp_value_placeholder"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:layout_marginBottom="4dp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/tv_rsrq"
@@ -53,5 +53,14 @@
             android:textSize="18sp" />
 
     </LinearLayout>
+
+    <!-- RecordControlFragment를 위한 Container -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/record_control_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

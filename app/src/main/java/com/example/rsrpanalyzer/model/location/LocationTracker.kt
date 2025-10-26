@@ -1,4 +1,4 @@
-package com.example.rsrpanalyzer.acquire.location
+package com.example.rsrpanalyzer.model.location
 
 import android.annotation.SuppressLint
 import android.content.Context

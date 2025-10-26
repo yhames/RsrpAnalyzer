@@ -9,17 +9,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.rsrpanalyzer.acquire.location.LocationTracker
-import com.example.rsrpanalyzer.acquire.signal.SignalMonitor
-import com.example.rsrpanalyzer.acquire.signal.SignalStrengthHelper
-import com.example.rsrpanalyzer.ui.map.MapVisualizer
-import com.example.rsrpanalyzer.viewmodel.MainViewModel
+import com.example.rsrpanalyzer.model.location.LocationTracker
+import com.example.rsrpanalyzer.model.signal.SignalMonitor
+import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
+import com.example.rsrpanalyzer.view.map.MapVisualizer
+import com.example.rsrpanalyzer.view.record.RecordControlFragment
+import com.example.rsrpanalyzer.viewmodel.SignalViewModel
 import com.kakao.vectormap.KakaoMapSdk
 import com.kakao.vectormap.MapView
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by viewModels()    // TODO: Replace with DI injection
+    private val signalViewModel: SignalViewModel by viewModels()
     private lateinit var mapView: MapView
     private lateinit var tvRsrp: TextView
     private lateinit var tvRsrq: TextView
@@ -64,6 +65,10 @@ class MainActivity : AppCompatActivity() {
 
         observeViewModel()
         requestPermissions()
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.record_control_container, RecordControlFragment())
+            .commit()
     }
 
     override fun onStart() {
@@ -102,10 +107,10 @@ class MainActivity : AppCompatActivity() {
     private fun startTracking() {
         if (isTracking.compareAndSet(false, true)) {
             locationTracker.start { location ->
-                viewModel.updateLocation(location)
+                signalViewModel.updateLocation(location)
             }
             signalMonitor.start { rsrp, rsrq ->
-                viewModel.updateSignal(rsrp, rsrq)
+                signalViewModel.updateSignal(rsrp, rsrq)
             }
         }
     }
@@ -118,15 +123,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.location.observe(this) { loc ->
+        signalViewModel.location.observe(this) { loc ->
             mapVisualizer.updateLocation(loc)
         }
-        viewModel.rsrp.observe(this) { rsrp ->
+        signalViewModel.rsrp.observe(this) { rsrp ->
             val rsrpLabel = this.getString(SignalStrengthHelper.getRsrpLevel(rsrp).labelResourceId)
             tvRsrp.text = getString(R.string.rsrp_value, rsrp, rsrpLabel)
             mapVisualizer.updateSignalStrength(rsrp)
         }
-        viewModel.rsrq.observe(this) { rsrq ->
+        signalViewModel.rsrq.observe(this) { rsrq ->
             val rsrqLabel = this.getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)
             tvRsrq.text = getString(R.string.rsrq_value, rsrq, rsrqLabel)
         }

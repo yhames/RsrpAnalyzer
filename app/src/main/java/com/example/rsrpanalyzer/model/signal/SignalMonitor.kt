@@ -1,4 +1,4 @@
-package com.example.rsrpanalyzer.acquire.signal
+package com.example.rsrpanalyzer.model.signal
 
 import android.content.Context
 import android.os.Build

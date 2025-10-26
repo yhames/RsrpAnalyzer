@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class SignalRepository(
-    private val sessionDao: SignalSessionDao, private val recordDao: SignalRecordDao
+    private val sessionDao: SignalSessionDao,
+    private val recordDao: SignalRecordDao
 ) {
     // 새로운 세션 생성
     suspend fun createSession(sessionName: String): SignalSessionEntity =

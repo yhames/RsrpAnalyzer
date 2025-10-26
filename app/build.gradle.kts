@@ -67,6 +67,7 @@ dependencies {
 
     // Kotlin extensions for lifecycle viewmodel
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     // Kakao Map

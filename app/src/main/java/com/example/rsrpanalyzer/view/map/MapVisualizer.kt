@@ -1,4 +1,4 @@
-package com.example.rsrpanalyzer.ui.map
+package com.example.rsrpanalyzer.view.map
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.location.Location
 import android.util.Log
 import androidx.core.graphics.createBitmap
-import com.example.rsrpanalyzer.acquire.signal.SignalStrengthHelper
+import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.LatLng

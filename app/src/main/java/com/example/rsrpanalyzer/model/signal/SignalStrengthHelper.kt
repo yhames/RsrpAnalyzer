@@ -1,4 +1,4 @@
-package com.example.rsrpanalyzer.acquire.signal
+package com.example.rsrpanalyzer.model.signal
 
 import com.example.rsrpanalyzer.R
 
