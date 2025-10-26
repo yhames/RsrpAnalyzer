@@ -19,7 +19,7 @@ import com.kakao.vectormap.MapView
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()    // TODO: Replace with DI injection
     private lateinit var mapView: MapView
     private lateinit var tvRsrp: TextView
     private lateinit var tvRsrq: TextView
