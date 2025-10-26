@@ -1,4 +1,4 @@
-package com.example.rsrpanalyzer
+package com.example.rsrpanalyzer.viewmodel
 
 import android.location.Location
 import androidx.lifecycle.LiveData

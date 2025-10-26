@@ -1,4 +1,6 @@
-package com.example.rsrpanalyzer
+package com.example.rsrpanalyzer.acquire.signal
+
+import com.example.rsrpanalyzer.R
 
 object SignalStrengthHelper {
 

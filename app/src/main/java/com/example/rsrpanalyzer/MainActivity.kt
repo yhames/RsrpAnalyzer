@@ -9,6 +9,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.rsrpanalyzer.acquire.location.LocationTracker
+import com.example.rsrpanalyzer.acquire.signal.SignalMonitor
+import com.example.rsrpanalyzer.acquire.signal.SignalStrengthHelper
+import com.example.rsrpanalyzer.ui.map.MapVisualizer
+import com.example.rsrpanalyzer.viewmodel.MainViewModel
 import com.kakao.vectormap.KakaoMapSdk
 import com.kakao.vectormap.MapView
 import java.util.concurrent.atomic.AtomicBoolean
@@ -20,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvRsrq: TextView
     private lateinit var locationTracker: LocationTracker
     private lateinit var signalMonitor: SignalMonitor
-    private lateinit var mapController: MapController
+    private lateinit var mapVisualizer: MapVisualizer
     private var isTracking = AtomicBoolean(false)
 
     private val requiredPermissions = arrayOf(
@@ -51,8 +56,8 @@ class MainActivity : AppCompatActivity() {
 
         KakaoMapSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
 
-        mapController = MapController(this, mapView)
-        mapController.init()
+        mapVisualizer = MapVisualizer(this, mapView)
+        mapVisualizer.init()
 
         locationTracker = LocationTracker(this)
         signalMonitor = SignalMonitor(this)
@@ -114,12 +119,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.location.observe(this) { loc ->
-            mapController.updateLocation(loc)
+            mapVisualizer.updateLocation(loc)
         }
         viewModel.rsrp.observe(this) { rsrp ->
             val rsrpLabel = this.getString(SignalStrengthHelper.getRsrpLevel(rsrp).labelResourceId)
             tvRsrp.text = getString(R.string.rsrp_value, rsrp, rsrpLabel)
-            mapController.updateSignalStrength(rsrp)
+            mapVisualizer.updateSignalStrength(rsrp)
         }
         viewModel.rsrq.observe(this) { rsrq ->
             val rsrqLabel = this.getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)

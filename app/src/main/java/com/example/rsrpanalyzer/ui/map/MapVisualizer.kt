@@ -1,4 +1,4 @@
-package com.example.rsrpanalyzer
+package com.example.rsrpanalyzer.ui.map
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.location.Location
 import android.util.Log
 import androidx.core.graphics.createBitmap
+import com.example.rsrpanalyzer.acquire.signal.SignalStrengthHelper
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.LatLng
@@ -21,7 +22,7 @@ import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
 import java.util.concurrent.atomic.AtomicInteger
 
-class MapController(private val context: Context, private val mapView: MapView) {
+class MapVisualizer(private val context: Context, private val mapView: MapView) {
     private var kakaoMap: KakaoMap? = null
     private var labelManager: LabelManager? = null
     private var labelLayer: LabelLayer? = null
