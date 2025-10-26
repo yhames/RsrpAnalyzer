@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    kotlin("kapt")
 }
 
 val properties = Properties().apply {
@@ -46,7 +47,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "11"    // TODO: fix deprecated warning
     }
 }
 
@@ -62,7 +63,7 @@ dependencies {
 
     // Room Database
     implementation(libs.androidx.room.runtime)
-    annotationProcessor(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)   // TODO: Change kapt into ksp for better performance
     androidTestImplementation(libs.androidx.room.testing)
 
     // Kotlin extensions for lifecycle viewmodel
