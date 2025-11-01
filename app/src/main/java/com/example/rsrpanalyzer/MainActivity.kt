@@ -13,6 +13,7 @@ import com.example.rsrpanalyzer.model.location.LocationTracker
 import com.example.rsrpanalyzer.model.signal.SignalMonitor
 import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
 import com.example.rsrpanalyzer.view.map.MapVisualizer
+import com.example.rsrpanalyzer.view.navigation.BottomNavBar
 import com.example.rsrpanalyzer.view.record.RecordControlFragment
 import com.example.rsrpanalyzer.viewmodel.SignalViewModel
 import com.kakao.vectormap.KakaoMapSdk
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var locationTracker: LocationTracker
     private lateinit var signalMonitor: SignalMonitor
     private lateinit var mapVisualizer: MapVisualizer
+    private lateinit var bottomNavBar: BottomNavBar
     private var isTracking = AtomicBoolean(false)
 
     private val requiredPermissions = arrayOf(
@@ -62,6 +64,9 @@ class MainActivity : AppCompatActivity() {
 
         locationTracker = LocationTracker(this)
         signalMonitor = SignalMonitor(this)
+
+        bottomNavBar = BottomNavBar(this)
+        bottomNavBar.setup()
 
         observeViewModel()
         requestPermissions()

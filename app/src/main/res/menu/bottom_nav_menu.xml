@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/group_view" android:checkableBehavior="single">
+        <item
+            android:id="@+id/navigation_map"
+            android:icon="@android:drawable/ic_menu_mapmode"
+            android:title="@string/map_view" />
+        <item
+            android:id="@+id/navigation_data"
+            android:icon="@android:drawable/ic_menu_sort_by_size"
+            android:title="@string/data_view" />
+    </group>
+    <group android:id="@+id/group_mode" android:checkableBehavior="single">
+        <item
+            android:id="@+id/navigation_realtime"
+            android:icon="@android:drawable/ic_media_play"
+            android:title="@string/current_view" />
+        <item
+            android:id="@+id/navigation_history"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="@string/previous_record_view" />
+    </group>
+</menu>

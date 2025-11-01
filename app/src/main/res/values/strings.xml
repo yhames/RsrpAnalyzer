@@ -7,6 +7,11 @@
     <string name="rsrp_value">RSRP: %d dBm (%s)</string>
     <string name="rsrq_value">RSRQ: %d dB (%s)</string>
 
+    <string name="map_view">지도 보기</string>
+    <string name="data_view">데이터 보기</string>
+    <string name="current_view">실시간 보기</string>
+    <string name="previous_record_view">이전 기록 보기</string>
+
     <string name="signal_measuring_status">신호 측정 중…</string>
     <string name="signal_excellent">매우 좋음</string>
     <string name="signal_good">좋음</string>
@@ -16,9 +21,12 @@
     <string name="signal_no_signal">신호 없음</string>
 
     <string name="session_name">세션 이름</string>
-    <string name="session_start_recording">녹화 시작</string>
-    <string name="session_stop_recording">녹화 중지</string>
-    <string name="session_tv_status_idle">녹화 가능</string>
-    <string name="session_tv_status_ongoing">녹화 중</string>
+
+    <string name="session_start_recording">기록 시작</string>
+    <string name="session_restart_recording">기록 재개</string>
+    <string name="session_stop_recording">기록 중지</string>
+
+    <string name="session_tv_status_idle">기록 가능</string>
+    <string name="session_tv_status_ongoing">기록중</string>
 
 </resources>
