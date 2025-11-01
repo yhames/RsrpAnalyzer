@@ -1,5 +1,25 @@
 # RsrpAnalyzer
 
+- [RsrpAnalyzer](#rsrpanalyzer)
+    - [Key Dependencies](#key-dependencies)
+    - [Summary](#summary)
+        - [주요 기능](#주요-기능)
+    - [Project Structure](#project-structure)
+    - [Project Architecture](#project-architecture)
+    - [UI Design](#ui-design)
+    - [Database Schema](#database-schema)
+        - [signal\_sessions](#signal_sessions)
+        - [signal\_records](#signal_records)
+        - [SQL](#sql)
+    - [CSV Format](#csv-format)
+        - [schema](#schema)
+        - [example](#example)
+    - [Usage](#usage)
+        - [실시간 모니터링](#실시간-모니터링)
+        - [RSRP/RSRQ 측정 세션](#rsrprsrq-측정-세션)
+        - [시각화 사진 내보내기](#시각화-사진-내보내기)
+        - [CSV 데이터 내보내기](#csv-데이터-내보내기)
+
 **Android LTE Signal Strength Analyzer**
 
 - **Language**: Kotlin 2.0.21
@@ -11,6 +31,7 @@
 - **JVM Target**: 11
 
 ### Key Dependencies
+
 - **Room Database**: 2.6.1 - Local SQLite data persistence with KSP
 - **Kakao Maps SDK**: 2.11.0 - Map visualization
 - **Google Play Services Location**: 21.3.0 - GPS tracking and fused location
@@ -22,29 +43,29 @@ RsrpAnalyzer는 실시간으로 LTE 신호 강도(RSRP)와 품질(RSRQ)을 측�
 ### 주요 기능
 
 1. **실시간 신호 모니터링**
-   - LTE RSRP(Reference Signal Received Power) 측정
-   - RSRQ(Reference Signal Received Quality) 측정
-   - 신호 강도 변화 실시간 추적
+    - LTE RSRP(Reference Signal Received Power) 측정
+    - RSRQ(Reference Signal Received Quality) 측정
+    - 신호 강도 변화 실시간 추적
 
 2. **위치 기반 기록**
-   - GPS를 활용한 정확한 위치 정보 수집
-   - 신호 강도와 위치 정보 동시 저장
-   - 이동 경로별 신호 세기 분석
+    - GPS를 활용한 정확한 위치 정보 수집
+    - 신호 강도와 위치 정보 동시 저장
+    - 이동 경로별 신호 세기 분석
 
 3. **세션 관리**
-   - 여러 측정 세션 생성 및 관리
-   - 세션별 데이터 독립 저장
-   - 세션 간 비교 분석 가능
+    - 여러 측정 세션 생성 및 관리
+    - 세션별 데이터 독립 저장
+    - 세션 간 비교 분석 가능
 
 4. **지도 시각화**
-   - Kakao Map을 이용한 측정 위치 표시
-   - 신호 강도에 따른 색상 구분
-   - 측정 경로 시각화
+    - Kakao Map을 이용한 측정 위치 표시
+    - 신호 강도에 따른 색상 구분
+    - 측정 경로 시각화
 
 5. **데이터 내보내기**
-   - CSV 형식으로 데이터 추출
-   - 세션별 또는 전체 데이터 내보내기
-   - 외부 분석 도구와 연동 가능
+    - CSV 형식으로 데이터 추출
+    - 세션별 또는 전체 데이터 내보내기
+    - 외부 분석 도구와 연동 가능
 
 ## Project Structure
 
@@ -180,22 +201,26 @@ recordId,sessionId,sessionName,sessionCreatedAt,timestampMillis,latitude,longitu
 ## Usage
 
 ### 실시간 모니터링
+
 - 화면에 실시간 RSRP/RSRQ 값 표시
 - 지도에서 현재 위치 및 신호 강도 확인
 - 이동하면서 실시간 RSRP/RSRQ 확인
 
 ### RSRP/RSRQ 측정 세션
+
 1. 앱 실행 후 위치 권한 및 전화 상태 권한 허용
 2. '기록 시작' 버튼 클릭
 3. 새 세션 이름 입력
 4. 측정 시작
 
 ### 시각화 사진 내보내기
+
 1. 측정 완료 후 '기록 중지' 버튼 클릭
 2. 이전 기록 보기에서 이미지 내보내기 선택
 3. 사진첩에 이미지 저장
 
 ### CSV 데이터 내보내기
+
 1. 측정 완료 후 '기록 중지' 버튼 클릭
 2. 이전 기록 보기에서 CSV 내보내기 선택
 3. 저장 위치 지정 후 데이터 저장
