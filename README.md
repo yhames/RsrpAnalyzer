@@ -1,4 +1,5 @@
 # RsrpAnalyzer
+
 RsrpAnalyzer
 
 ## Summary
@@ -39,7 +40,7 @@ rsrpanalyzer/
 
 ## Project Architecture
 
-[//]: # (Add Project Architecture)
+![project_architecture](./docs/project_architecture.jpg)
 
 ## UI Design
 
