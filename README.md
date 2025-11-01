@@ -15,8 +15,8 @@
   - [Usage](#usage)
     - [실시간 모니터링](#실시간-모니터링)
     - [RSRP/RSRQ 측정 세션](#rsrprsrq-측정-세션)
-    - [시각화 사진 내보내기](#시각화-사진-내보내기)
-    - [CSV 데이터 내보내기](#csv-데이터-내보내기)
+    - [이미지 내보내기](#이미지-내보내기)
+    - [CSV 내보내기](#csv-내보내기)
 
 # RsrpAnalyzer
 
@@ -213,13 +213,13 @@ recordId,sessionId,sessionName,sessionCreatedAt,timestampMillis,latitude,longitu
 3. 새 세션 이름 입력
 4. 측정 시작
 
-### 시각화 사진 내보내기
+### 이미지 내보내기
 
 1. 측정 완료 후 '기록 중지' 버튼 클릭
 2. 이전 기록 보기에서 이미지 내보내기 선택
 3. 사진첩에 이미지 저장
 
-### CSV 데이터 내보내기
+### CSV 내보내기
 
 1. 측정 완료 후 '기록 중지' 버튼 클릭
 2. 이전 기록 보기에서 CSV 내보내기 선택
