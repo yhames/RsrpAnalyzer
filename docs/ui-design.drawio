@@ -19,7 +19,7 @@
         <mxCell id="3Xi9j7mOmbRa12QB_F9K-4" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;b&gt;지도로 보기&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#D5E8D4;fontColor=#333333;strokeColor=#666666;" parent="1" vertex="1">
           <mxGeometry y="674.5699999999999" width="205" height="65.43" as="geometry" />
         </mxCell>
-        <mxCell id="3Xi9j7mOmbRa12QB_F9K-2" value="&lt;font&gt;녹화시작&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;arcSize=45;fontStyle=1;fontSize=18;opacity=80;" parent="1" vertex="1">
+        <mxCell id="3Xi9j7mOmbRa12QB_F9K-2" value="&lt;font&gt;기록시작&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;arcSize=45;fontStyle=1;fontSize=18;opacity=80;" parent="1" vertex="1">
           <mxGeometry x="650" y="600" width="150" height="50" as="geometry" />
         </mxCell>
         <mxCell id="3Xi9j7mOmbRa12QB_F9K-6" value="&lt;div style=&quot;line-height: 160%;&quot;&gt;&lt;font style=&quot;font-size: 16px; color: rgb(255, 255, 255); line-height: 160%;&quot;&gt;&lt;b&gt;신호 측정 중...&lt;/b&gt;&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 16px; color: rgb(255, 255, 255); line-height: 160%;&quot;&gt;&lt;b&gt;RSRP: -100 dBm&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 16px; color: rgb(255, 255, 255); line-height: 160%;&quot;&gt;&lt;b&gt;RSRQ: -10 dB&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;opacity=60;align=left;spacing=8;" parent="1" vertex="1">
@@ -43,7 +43,7 @@
         <mxCell id="3Xi9j7mOmbRa12QB_F9K-18" value="&lt;span style=&quot;font-size: 35px;&quot;&gt;&lt;b&gt;실시간 보기 화면 (지도보기)&lt;/b&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
           <mxGeometry width="820" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="3Xi9j7mOmbRa12QB_F9K-35" value="&lt;font&gt;녹화시작&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;arcSize=45;fontStyle=1;fontSize=18;opacity=80;" parent="1" vertex="1">
+        <mxCell id="3Xi9j7mOmbRa12QB_F9K-35" value="&lt;font&gt;기록시작&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;arcSize=45;fontStyle=1;fontSize=18;opacity=80;" parent="1" vertex="1">
           <mxGeometry x="650" y="1360" width="150" height="50" as="geometry" />
         </mxCell>
         <mxCell id="3Xi9j7mOmbRa12QB_F9K-39" value="&lt;font&gt;&lt;b&gt;5:24&amp;nbsp; &amp;nbsp;11월 11일 화요일&amp;nbsp; &amp;nbsp;&lt;sup&gt;📷🌤️💬&lt;/sup&gt;&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=none;align=left;spacing=12;fontSize=14;" parent="1" vertex="1">
@@ -238,10 +238,10 @@
         <mxCell id="3Xi9j7mOmbRa12QB_F9K-111" value="&lt;b style=&quot;forced-color-adjust: none; color: rgb(0, 0, 0); font-family: Helvetica; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; font-size: 12px;&quot;&gt;&lt;font style=&quot;forced-color-adjust: none; font-size: 40px;&quot;&gt;📷&lt;/font&gt;&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
           <mxGeometry x="864.75" y="592" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="3Xi9j7mOmbRa12QB_F9K-114" value="&lt;font&gt;녹화재개&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;arcSize=45;fontStyle=1;fontSize=18;opacity=80;" parent="1" vertex="1">
+        <mxCell id="3Xi9j7mOmbRa12QB_F9K-114" value="&lt;font&gt;기록재개&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;arcSize=45;fontStyle=1;fontSize=18;opacity=80;" parent="1" vertex="1">
           <mxGeometry x="1480" y="600" width="150" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="3Xi9j7mOmbRa12QB_F9K-115" value="&lt;font&gt;녹화재개&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;arcSize=45;fontStyle=1;fontSize=18;opacity=80;" parent="1" vertex="1">
+        <mxCell id="3Xi9j7mOmbRa12QB_F9K-115" value="&lt;font&gt;기록재개&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;arcSize=45;fontStyle=1;fontSize=18;opacity=80;" parent="1" vertex="1">
           <mxGeometry x="1480" y="1360" width="150" height="50" as="geometry" />
         </mxCell>
         <mxCell id="3Xi9j7mOmbRa12QB_F9K-120" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="3Xi9j7mOmbRa12QB_F9K-116" target="3Xi9j7mOmbRa12QB_F9K-111" edge="1">
