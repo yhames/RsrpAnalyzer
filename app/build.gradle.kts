@@ -3,7 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    kotlin("kapt")
+    alias(libs.plugins.kotlin.symbol.processing)
 }
 
 val properties = Properties().apply {
@@ -63,7 +63,7 @@ dependencies {
 
     // Room Database
     implementation(libs.androidx.room.runtime)
-    kapt(libs.androidx.room.compiler)   // TODO: Change kapt into ksp for better performance
+    ksp(libs.androidx.room.compiler)
     androidTestImplementation(libs.androidx.room.testing)
 
     // Kotlin extensions for lifecycle viewmodel
