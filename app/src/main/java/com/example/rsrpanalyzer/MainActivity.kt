@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import com.example.rsrpanalyzer.model.location.LocationTracker
 import com.example.rsrpanalyzer.model.signal.SignalMonitor
 import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
-import com.example.rsrpanalyzer.view.map.MapVisualizer
+import com.example.rsrpanalyzer.view.signal.MapViewFragment
 import com.example.rsrpanalyzer.view.navigation.BottomNavBar
 import com.example.rsrpanalyzer.view.record.RecordControlFragment
 import com.example.rsrpanalyzer.viewmodel.RecordViewModel
@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvRecordingStatus: TextView
     private lateinit var locationTracker: LocationTracker
     private lateinit var signalMonitor: SignalMonitor
-    private lateinit var mapVisualizer: MapVisualizer
+    private lateinit var mapVisualizer: MapViewFragment
     private lateinit var bottomNavBar: BottomNavBar
     private var isTracking = AtomicBoolean(false)
 
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         KakaoMapSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
 
-        mapVisualizer = MapVisualizer(this, mapView)
+        mapVisualizer = MapViewFragment(this, mapView)
         mapVisualizer.init()
 
         locationTracker = LocationTracker(this)
