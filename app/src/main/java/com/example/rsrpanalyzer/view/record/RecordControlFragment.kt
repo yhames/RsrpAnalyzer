@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.rsrpanalyzer.R
@@ -23,8 +23,6 @@ class RecordControlFragment : Fragment() {
     private val signalViewModel: SignalViewModel by activityViewModels()
     private lateinit var recordManager: RecordManager
     private lateinit var btnRecord: Button
-    private lateinit var etSessionName: EditText
-    private lateinit var tvStatus: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -32,9 +30,6 @@ class RecordControlFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_record_control, container, false)
 
         btnRecord = view.findViewById(R.id.btn_record)
-        etSessionName = view.findViewById(R.id.et_session_name)
-        tvStatus = view.findViewById(R.id.tv_status)
-
 
         val db = DatabaseProvider.getDatabase(requireContext())
         val repository = SignalRepository(db.signalSessionDao(), db.signalRecordDao())
@@ -50,10 +45,8 @@ class RecordControlFragment : Fragment() {
         recordViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
             if (isRecording) {
                 btnRecord.text = this.getString(R.string.session_stop_recording)
-                tvStatus.text = this.getString(R.string.session_tv_status_ongoing)
             } else {
                 btnRecord.text = this.getString(R.string.session_start_recording)
-                tvStatus.text = this.getString(R.string.session_tv_status_idle)
             }
         }
 
@@ -62,12 +55,31 @@ class RecordControlFragment : Fragment() {
                 recordManager.stopRecording()
                 recordViewModel.updateRecordingStatus(false)
             } else {
-                val sessionName = etSessionName.text.toString()
-                    .ifBlank { "Session_${System.currentTimeMillis()}" }
-                recordManager.startRecording(sessionName)
-                recordViewModel.updateRecordingStatus(true)
+                showSessionNameDialog()
             }
         }
+    }
+
+    private fun showSessionNameDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Enter session name")
+
+        val input = EditText(requireContext())
+        input.hint = "Session Name"
+        builder.setView(input)
+
+        builder.setPositiveButton(android.R.string.ok) { _, _ ->
+            val sessionName = input.text.toString()
+                .ifBlank { "Session_${System.currentTimeMillis()}" }
+            recordManager.startRecording(sessionName)
+            recordViewModel.updateSessionName(sessionName)
+            recordViewModel.updateRecordingStatus(true)
+        }
+        builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
     }
 
     private fun observeSignalsForRecording() {

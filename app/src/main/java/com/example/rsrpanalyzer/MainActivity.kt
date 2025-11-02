@@ -3,6 +3,7 @@ package com.example.rsrpanalyzer
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,6 +16,7 @@ import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
 import com.example.rsrpanalyzer.view.map.MapVisualizer
 import com.example.rsrpanalyzer.view.navigation.BottomNavBar
 import com.example.rsrpanalyzer.view.record.RecordControlFragment
+import com.example.rsrpanalyzer.viewmodel.RecordViewModel
 import com.example.rsrpanalyzer.viewmodel.SignalViewModel
 import com.kakao.vectormap.KakaoMapSdk
 import com.kakao.vectormap.MapView
@@ -22,9 +24,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : AppCompatActivity() {
     private val signalViewModel: SignalViewModel by viewModels()
+    private val recordViewModel: RecordViewModel by viewModels()
     private lateinit var mapView: MapView
     private lateinit var tvRsrp: TextView
     private lateinit var tvRsrq: TextView
+    private lateinit var tvRecordingStatus: TextView
     private lateinit var locationTracker: LocationTracker
     private lateinit var signalMonitor: SignalMonitor
     private lateinit var mapVisualizer: MapVisualizer
@@ -56,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         mapView = findViewById(R.id.map_view)
         tvRsrp = findViewById(R.id.tv_rsrp)
         tvRsrq = findViewById(R.id.tv_rsrq)
+        tvRecordingStatus = findViewById(R.id.tv_recording_status)
 
         KakaoMapSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
 
@@ -139,6 +144,18 @@ class MainActivity : AppCompatActivity() {
         signalViewModel.rsrq.observe(this) { rsrq ->
             val rsrqLabel = this.getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)
             tvRsrq.text = getString(R.string.rsrq_value, rsrq, rsrqLabel)
+        }
+
+        recordViewModel.isRecording.observe(this) { isRecording ->
+            if (isRecording) {
+                tvRecordingStatus.visibility = View.VISIBLE
+            } else {
+                tvRecordingStatus.visibility = View.GONE
+            }
+        }
+
+        recordViewModel.sessionName.observe(this) { sessionName ->
+            tvRecordingStatus.text = getString(R.string.session_recording_status, sessionName)
         }
     }
 }

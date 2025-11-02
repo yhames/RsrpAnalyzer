@@ -25,6 +25,7 @@
     <string name="session_start_recording">기록 시작</string>
     <string name="session_restart_recording">기록 재개</string>
     <string name="session_stop_recording">기록 중지</string>
+    <string name="session_recording_status">Recording: %s</string>
 
     <string name="session_tv_status_idle">기록 가능</string>
     <string name="session_tv_status_ongoing">기록중</string>
