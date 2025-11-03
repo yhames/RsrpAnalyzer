@@ -6,10 +6,15 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.location.Location
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import androidx.core.graphics.createBitmap
+import com.example.rsrpanalyzer.BuildConfig
+import com.example.rsrpanalyzer.R
 import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
+import com.kakao.vectormap.KakaoMapSdk
 import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapView
@@ -22,15 +27,23 @@ import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
 import java.util.concurrent.atomic.AtomicInteger
 
-class MapViewFragment(private val context: Context, private val mapView: MapView) {
+class MapViewFragment(private val context: Context, private val rootView: View) {
     private var kakaoMap: KakaoMap? = null
     private var labelManager: LabelManager? = null
     private var labelLayer: LabelLayer? = null
     private var positionLabel: Label? = null
+    private lateinit var mapView: MapView
     private val currentRsrp = AtomicInteger(Int.MIN_VALUE)
     private val bitmapCache = mutableMapOf<Int, Bitmap>()
+    private lateinit var tvRsrp: TextView
+    private lateinit var tvRsrq: TextView
 
     fun init() {
+        KakaoMapSdk.init(context, BuildConfig.KAKAO_NATIVE_APP_KEY)
+        mapView = rootView.findViewById(R.id.map_view)
+        tvRsrp = rootView.findViewById(R.id.tv_rsrp)
+        tvRsrq = rootView.findViewById(R.id.tv_rsrq)
+
         mapView.start(object : MapLifeCycleCallback() {
             override fun onMapDestroy() {
                 Log.d("MapController", "Map destroyed")
@@ -78,14 +91,10 @@ class MapViewFragment(private val context: Context, private val mapView: MapView
         Log.d("MapController", "Camera moved to $position")
     }
 
-
-    /**
-     * RSRP 값을 업데이트합니다.
-     *
-     * @param rsrp RSRP 값
-     */
-    fun updateSignalStrength(rsrp: Int) {
+    fun updateRsrp(rsrp: Int) {
         currentRsrp.set(rsrp)
+        val rsrpLabel = context.getString(SignalStrengthHelper.getRsrpLevel(rsrp).labelResourceId)
+        tvRsrp.text = context.getString(R.string.rsrp_value, rsrp, rsrpLabel)
 
         positionLabel?.let { label ->
             try {
@@ -96,6 +105,11 @@ class MapViewFragment(private val context: Context, private val mapView: MapView
                 Log.e("MapController", "Error updating signal strength", e)
             }
         }
+    }
+
+    fun updateRsrq(rsrq: Int) {
+        val rsrqLabel = context.getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)
+        tvRsrq.text = context.getString(R.string.rsrq_value, rsrq, rsrqLabel)
     }
 
     /**

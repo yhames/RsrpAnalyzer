@@ -12,26 +12,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.rsrpanalyzer.model.location.LocationTracker
 import com.example.rsrpanalyzer.model.signal.SignalMonitor
-import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
-import com.example.rsrpanalyzer.view.signal.MapViewFragment
 import com.example.rsrpanalyzer.view.navigation.BottomNavBar
 import com.example.rsrpanalyzer.view.record.RecordControlFragment
+import com.example.rsrpanalyzer.view.signal.MapViewFragment
 import com.example.rsrpanalyzer.viewmodel.RecordViewModel
 import com.example.rsrpanalyzer.viewmodel.SignalViewModel
-import com.kakao.vectormap.KakaoMapSdk
-import com.kakao.vectormap.MapView
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : AppCompatActivity() {
     private val signalViewModel: SignalViewModel by viewModels()
     private val recordViewModel: RecordViewModel by viewModels()
-    private lateinit var mapView: MapView
-    private lateinit var tvRsrp: TextView
-    private lateinit var tvRsrq: TextView
     private lateinit var tvRecordingStatus: TextView
     private lateinit var locationTracker: LocationTracker
     private lateinit var signalMonitor: SignalMonitor
-    private lateinit var mapVisualizer: MapViewFragment
+    private lateinit var mapViewFragment: MapViewFragment
     private lateinit var bottomNavBar: BottomNavBar
     private var isTracking = AtomicBoolean(false)
 
@@ -57,15 +51,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mapView = findViewById(R.id.map_view)
-        tvRsrp = findViewById(R.id.tv_rsrp)
-        tvRsrq = findViewById(R.id.tv_rsrq)
         tvRecordingStatus = findViewById(R.id.tv_recording_status)
 
-        KakaoMapSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
-
-        mapVisualizer = MapViewFragment(this, mapView)
-        mapVisualizer.init()
+        mapViewFragment = MapViewFragment(this, window.decorView.rootView)
+        mapViewFragment.init()
 
         locationTracker = LocationTracker(this)
         signalMonitor = SignalMonitor(this)
@@ -134,16 +123,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         signalViewModel.location.observe(this) { loc ->
-            mapVisualizer.updateLocation(loc)
+            mapViewFragment.updateLocation(loc)
         }
         signalViewModel.rsrp.observe(this) { rsrp ->
-            val rsrpLabel = this.getString(SignalStrengthHelper.getRsrpLevel(rsrp).labelResourceId)
-            tvRsrp.text = getString(R.string.rsrp_value, rsrp, rsrpLabel)
-            mapVisualizer.updateSignalStrength(rsrp)
+            mapViewFragment.updateRsrp(rsrp)
         }
         signalViewModel.rsrq.observe(this) { rsrq ->
-            val rsrqLabel = this.getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)
-            tvRsrq.text = getString(R.string.rsrq_value, rsrq, rsrqLabel)
+            mapViewFragment.updateRsrq(rsrq)
         }
 
         recordViewModel.isRecording.observe(this) { isRecording ->
@@ -153,7 +139,6 @@ class MainActivity : AppCompatActivity() {
                 tvRecordingStatus.visibility = View.GONE
             }
         }
-
         recordViewModel.sessionName.observe(this) { sessionName ->
             tvRecordingStatus.text = getString(R.string.session_recording_status, sessionName)
         }
