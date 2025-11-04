@@ -10,6 +10,8 @@
         android:id="@+id/current_signal_info_panel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceContainerHighest"
+        android:elevation="4dp"
         android:orientation="horizontal"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,6 +56,15 @@
 
     </LinearLayout>
 
-    <!-- TODO: Add RecyclerView for signal history here -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_signal_history"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/current_signal_info_panel"
+        tools:listitem="@layout/item_signal_record" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

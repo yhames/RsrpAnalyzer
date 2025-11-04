@@ -16,7 +16,7 @@ class LocationTracker(private val context: Context) {
     @SuppressLint("MissingPermission")
     fun start(onUpdate: (Location) -> Unit) {
         val request = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY, 500L
+            Priority.PRIORITY_HIGH_ACCURACY, 1000L
         ).build()
 
         callback = object : LocationCallback() {
