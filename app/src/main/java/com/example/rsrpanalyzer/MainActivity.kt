@@ -9,12 +9,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.example.rsrpanalyzer.databinding.ActivityMainBinding
 import com.example.rsrpanalyzer.model.location.LocationTracker
 import com.example.rsrpanalyzer.model.signal.SignalMonitor
-import com.example.rsrpanalyzer.view.navigation.BottomNavBar
 import com.example.rsrpanalyzer.view.record.RecordControlFragment
 import com.example.rsrpanalyzer.view.signal.MapViewFragment
+import com.example.rsrpanalyzer.view.signal.TableViewFragment
 import com.example.rsrpanalyzer.viewmodel.RecordViewModel
 import com.example.rsrpanalyzer.viewmodel.SignalViewModel
 import java.util.concurrent.atomic.AtomicBoolean
@@ -22,14 +23,16 @@ import java.util.concurrent.atomic.AtomicBoolean
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
     private val signalViewModel: SignalViewModel by viewModels()
     private val recordViewModel: RecordViewModel by viewModels()
 
     private lateinit var locationTracker: LocationTracker
     private lateinit var signalMonitor: SignalMonitor
-    private lateinit var bottomNavBar: BottomNavBar
     private var isTracking = AtomicBoolean(false)
+
+    private val mapViewFragment by lazy { MapViewFragment() }
+    private val tableViewFragment by lazy { TableViewFragment() }
+    private var activeFragment: Fragment = mapViewFragment
 
     private val requiredPermissions = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -54,9 +57,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.main_fragment_container, MapViewFragment())
-                .commit()
+            supportFragmentManager.beginTransaction().apply {
+                add(R.id.main_fragment_container, tableViewFragment).hide(tableViewFragment)
+                add(R.id.main_fragment_container, mapViewFragment)
+            }.commit()
+            activeFragment = mapViewFragment
+
             supportFragmentManager.beginTransaction()
                 .replace(R.id.record_control_container, RecordControlFragment())
                 .commit()
@@ -65,9 +71,7 @@ class MainActivity : AppCompatActivity() {
         locationTracker = LocationTracker(this)
         signalMonitor = SignalMonitor(this)
 
-        bottomNavBar = BottomNavBar(this)
-        bottomNavBar.setup()
-
+        setupBottomNavigation()
         observeViewModel()
         requestPermissions()
     }
@@ -117,13 +121,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupBottomNavigation() {
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_map -> switchFragment(mapViewFragment)
+                R.id.navigation_data -> switchFragment(tableViewFragment)
+            }
+            true
+        }
+    }
+
+    private fun switchFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().hide(activeFragment).show(fragment).commit()
+        activeFragment = fragment
+    }
+
     private fun observeViewModel() {
         recordViewModel.isRecording.observe(this) { isRecording ->
             binding.tvRecordingStatus.visibility = if (isRecording) View.VISIBLE else View.GONE
         }
         recordViewModel.sessionName.observe(this) { sessionName ->
-            binding.tvRecordingStatus.text =
-                getString(R.string.session_recording_status, sessionName)
+            binding.tvRecordingStatus.text = getString(R.string.session_recording_status, sessionName)
         }
     }
 }

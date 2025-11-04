@@ -6,6 +6,15 @@
     <string name="rsrq_value_placeholder">RSRQ: — dB</string>
     <string name="rsrp_value">RSRP: %d dBm (%s)</string>
     <string name="rsrq_value">RSRQ: %d dB (%s)</string>
+    <string name="rsrp_value_simple">RSRP: %d</string>
+    <string name="rsrq_value_simple">RSRQ: %d</string>
+
+    <string name="latitude_placeholder">Lat: --</string>
+    <string name="longitude_placeholder">Lon: --</string>
+    <string name="latitude_value">Lat: %.6f</string>
+    <string name="longitude_value">Lon: %.6f</string>
+    <string name="rsrp_placeholder">RSRP: --</string>
+    <string name="rsrq_placeholder">RSRQ: --</string>
 
     <string name="map_view">지도 보기</string>
     <string name="data_view">데이터 보기</string>
