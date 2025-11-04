@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -14,22 +13,28 @@ import com.example.rsrpanalyzer.R
 import com.example.rsrpanalyzer.data.db.DatabaseProvider
 import com.example.rsrpanalyzer.data.model.SignalRecord
 import com.example.rsrpanalyzer.data.repository.SignalRepository
+import com.example.rsrpanalyzer.databinding.FragmentRecordControlBinding
 import com.example.rsrpanalyzer.model.record.RecordManager
 import com.example.rsrpanalyzer.viewmodel.RecordViewModel
 import com.example.rsrpanalyzer.viewmodel.SignalViewModel
 
 class RecordControlFragment : Fragment() {
+    private var _binding: FragmentRecordControlBinding? = null
+    private val binding get() = _binding!!
+
     private val recordViewModel: RecordViewModel by activityViewModels()
     private val signalViewModel: SignalViewModel by activityViewModels()
     private lateinit var recordManager: RecordManager
-    private lateinit var btnRecord: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.fragment_record_control, container, false)
+        _binding = FragmentRecordControlBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        btnRecord = view.findViewById(R.id.btn_record)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val db = DatabaseProvider.getDatabase(requireContext())
         val repository = SignalRepository(db.signalSessionDao(), db.signalRecordDao())
@@ -37,20 +42,23 @@ class RecordControlFragment : Fragment() {
 
         setupRecordManager()
         observeSignalsForRecording()
+    }
 
-        return view
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupRecordManager() {
         recordViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
             if (isRecording) {
-                btnRecord.text = this.getString(R.string.session_stop_recording)
+                binding.btnRecord.text = this.getString(R.string.session_stop_recording)
             } else {
-                btnRecord.text = this.getString(R.string.session_start_recording)
+                binding.btnRecord.text = this.getString(R.string.session_start_recording)
             }
         }
 
-        btnRecord.setOnClickListener {
+        binding.btnRecord.setOnClickListener {
             if (recordViewModel.isRecording.value == true) {
                 recordManager.stopRecording()
                 recordViewModel.updateRecordingStatus(false)

@@ -1,23 +1,27 @@
 package com.example.rsrpanalyzer.view.signal
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.location.Location
+import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
+import android.view.ViewGroup
 import androidx.core.graphics.createBitmap
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.example.rsrpanalyzer.BuildConfig
 import com.example.rsrpanalyzer.R
+import com.example.rsrpanalyzer.databinding.FragmentMapViewBinding
 import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
+import com.example.rsrpanalyzer.viewmodel.SignalViewModel
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.KakaoMapSdk
 import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
-import com.kakao.vectormap.MapView
 import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.Label
 import com.kakao.vectormap.label.LabelLayer
@@ -27,24 +31,32 @@ import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
 import java.util.concurrent.atomic.AtomicInteger
 
-class MapViewFragment(private val context: Context, private val rootView: View) {
+class MapViewFragment : Fragment(R.layout.fragment_map_view) {
+
+    private var _binding: FragmentMapViewBinding? = null
+    private val binding get() = _binding!!
+
+    private val signalViewModel: SignalViewModel by activityViewModels()
+
     private var kakaoMap: KakaoMap? = null
     private var labelManager: LabelManager? = null
     private var labelLayer: LabelLayer? = null
     private var positionLabel: Label? = null
-    private lateinit var mapView: MapView
     private val currentRsrp = AtomicInteger(Int.MIN_VALUE)
     private val bitmapCache = mutableMapOf<Int, Bitmap>()
-    private lateinit var tvRsrp: TextView
-    private lateinit var tvRsrq: TextView
 
-    fun init() {
-        KakaoMapSdk.init(context, BuildConfig.KAKAO_NATIVE_APP_KEY)
-        mapView = rootView.findViewById(R.id.map_view)
-        tvRsrp = rootView.findViewById(R.id.tv_rsrp)
-        tvRsrq = rootView.findViewById(R.id.tv_rsrq)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentMapViewBinding.inflate(inflater, container, false)
+        KakaoMapSdk.init(requireContext(), BuildConfig.KAKAO_NATIVE_APP_KEY)
+        return binding.root
+    }
 
-        mapView.start(object : MapLifeCycleCallback() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.mapView.start(object : MapLifeCycleCallback() {
             override fun onMapDestroy() {
                 Log.d("MapController", "Map destroyed")
             }
@@ -52,7 +64,6 @@ class MapViewFragment(private val context: Context, private val rootView: View) 
             override fun onMapError(error: Exception?) {
                 Log.e("MapController", "Map error: ${error?.message}")
             }
-
         }, object : KakaoMapReadyCallback() {
             override fun onMapReady(map: KakaoMap) {
                 kakaoMap = map
@@ -61,19 +72,33 @@ class MapViewFragment(private val context: Context, private val rootView: View) 
                 Log.d("MapController", "Map ready")
             }
         })
+
+        observeViewModel()
     }
 
-    /**
-     * 위치 정보를 업데이트합니다.
-     *
-     * @param location 위치 정보
-     */
-    fun updateLocation(location: Location) {
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun observeViewModel() {
+        signalViewModel.location.observe(viewLifecycleOwner) { loc ->
+            updateLocation(loc)
+        }
+        signalViewModel.rsrp.observe(viewLifecycleOwner) { rsrp ->
+            updateRsrp(rsrp)
+        }
+        signalViewModel.rsrq.observe(viewLifecycleOwner) { rsrq ->
+            updateRsrq(rsrq)
+        }
+    }
+
+    private fun updateLocation(location: Location) {
+        if (!isAdded) return
         val map = kakaoMap ?: return
         val layer = labelLayer ?: return
         val manager = labelManager ?: return
 
-        // Create or update positionLabel
         val position = LatLng.from(location.latitude, location.longitude)
         val styles = manager.addLabelStyles(LabelStyles.from(createRsrpLabelStyle()))
         if (positionLabel == null) {
@@ -91,10 +116,11 @@ class MapViewFragment(private val context: Context, private val rootView: View) 
         Log.d("MapController", "Camera moved to $position")
     }
 
-    fun updateRsrp(rsrp: Int) {
+    private fun updateRsrp(rsrp: Int) {
+        if (!isAdded) return
         currentRsrp.set(rsrp)
-        val rsrpLabel = context.getString(SignalStrengthHelper.getRsrpLevel(rsrp).labelResourceId)
-        tvRsrp.text = context.getString(R.string.rsrp_value, rsrp, rsrpLabel)
+        val rsrpLabel = getString(SignalStrengthHelper.getRsrpLevel(rsrp).labelResourceId)
+        binding.tvRsrp.text = getString(R.string.rsrp_value, rsrp, rsrpLabel)
 
         positionLabel?.let { label ->
             try {
@@ -107,51 +133,36 @@ class MapViewFragment(private val context: Context, private val rootView: View) 
         }
     }
 
-    fun updateRsrq(rsrq: Int) {
-        val rsrqLabel = context.getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)
-        tvRsrq.text = context.getString(R.string.rsrq_value, rsrq, rsrqLabel)
+    private fun updateRsrq(rsrq: Int) {
+        if (!isAdded) return
+        val rsrqLabel = getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)
+        binding.tvRsrq.text = getString(R.string.rsrq_value, rsrq, rsrqLabel)
     }
 
-    /**
-     * @return currentRsrp에 해당하는 LabelStyle
-     */
     private fun createRsrpLabelStyle(): LabelStyle {
         val rsrpLevel = SignalStrengthHelper.getRsrpLevel(currentRsrp.get())
-        val color = context.getColor(rsrpLevel.color)
+        val color = requireContext().getColor(rsrpLevel.color)
         val bitmap = bitmapCache.getOrPut(color) {
             createColoredCircleBitmap(color, 40)
         }
         return LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
     }
 
-    /**
-     * @param color 색상 값
-     * @param size 크기 (픽셀)
-     * @param factor 내부 원의 밝기 조절 비율
-     * @return 원 모양의 Bitmap
-     */
     private fun createColoredCircleBitmap(color: Int, size: Int, factor: Float = 1.3f): Bitmap {
         val bitmap = createBitmap(size, size)
         val canvas = Canvas(bitmap)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-        // 외곽선
         paint.style = Paint.Style.FILL
         paint.color = color
         canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2, paint)
 
-        // 내부 원 (더 밝게)
         paint.color = adjustColorBrightness(color, factor)
         canvas.drawCircle(size / 2f, size / 2f, size / 3f, paint)
 
         return bitmap
     }
 
-    /**
-     * @param color 색상 값
-     * @param factor 밝기 조절 비율
-     * @return 조절된 색상 값
-     */
     private fun adjustColorBrightness(color: Int, factor: Float): Int {
         val r = ((color shr 16 and 0xff) * factor).toInt().coerceIn(0, 255)
         val g = ((color shr 8 and 0xff) * factor).toInt().coerceIn(0, 255)

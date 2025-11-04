@@ -4,12 +4,12 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.rsrpanalyzer.databinding.ActivityMainBinding
 import com.example.rsrpanalyzer.model.location.LocationTracker
 import com.example.rsrpanalyzer.model.signal.SignalMonitor
 import com.example.rsrpanalyzer.view.navigation.BottomNavBar
@@ -20,12 +20,14 @@ import com.example.rsrpanalyzer.viewmodel.SignalViewModel
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     private val signalViewModel: SignalViewModel by viewModels()
     private val recordViewModel: RecordViewModel by viewModels()
-    private lateinit var tvRecordingStatus: TextView
+
     private lateinit var locationTracker: LocationTracker
     private lateinit var signalMonitor: SignalMonitor
-    private lateinit var mapViewFragment: MapViewFragment
     private lateinit var bottomNavBar: BottomNavBar
     private var isTracking = AtomicBoolean(false)
 
@@ -38,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     private val permissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             if (permissions.values.all { it }) {
-                // Scenario2: Start tracking after all permissions are granted
                 startTracking()
             } else {
                 Toast.makeText(
@@ -49,12 +50,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        tvRecordingStatus = findViewById(R.id.tv_recording_status)
-
-        mapViewFragment = MapViewFragment(this, window.decorView.rootView)
-        mapViewFragment.init()
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.main_fragment_container, MapViewFragment())
+                .commit()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.record_control_container, RecordControlFragment())
+                .commit()
+        }
 
         locationTracker = LocationTracker(this)
         signalMonitor = SignalMonitor(this)
@@ -64,16 +70,11 @@ class MainActivity : AppCompatActivity() {
 
         observeViewModel()
         requestPermissions()
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.record_control_container, RecordControlFragment())
-            .commit()
     }
 
     override fun onStart() {
         super.onStart()
         if (hasRequiredPermissions()) {
-            // Scenario3: Resume tracking when transitioning from background to foreground
             startTracking()
         }
     }
@@ -83,10 +84,6 @@ class MainActivity : AppCompatActivity() {
         stopTracking()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     private fun requestPermissions() {
         val notGranted = requiredPermissions.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
@@ -94,7 +91,6 @@ class MainActivity : AppCompatActivity() {
         if (notGranted.isNotEmpty()) {
             permissionsLauncher.launch(notGranted.toTypedArray())
         } else {
-            // Scenario1: Start tracking when all required permissions are already granted
             startTracking()
         }
     }
@@ -122,25 +118,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        signalViewModel.location.observe(this) { loc ->
-            mapViewFragment.updateLocation(loc)
-        }
-        signalViewModel.rsrp.observe(this) { rsrp ->
-            mapViewFragment.updateRsrp(rsrp)
-        }
-        signalViewModel.rsrq.observe(this) { rsrq ->
-            mapViewFragment.updateRsrq(rsrq)
-        }
-
         recordViewModel.isRecording.observe(this) { isRecording ->
-            if (isRecording) {
-                tvRecordingStatus.visibility = View.VISIBLE
-            } else {
-                tvRecordingStatus.visibility = View.GONE
-            }
+            binding.tvRecordingStatus.visibility = if (isRecording) View.VISIBLE else View.GONE
         }
         recordViewModel.sessionName.observe(this) { sessionName ->
-            tvRecordingStatus.text = getString(R.string.session_recording_status, sessionName)
+            binding.tvRecordingStatus.text =
+                getString(R.string.session_recording_status, sessionName)
         }
     }
 }
