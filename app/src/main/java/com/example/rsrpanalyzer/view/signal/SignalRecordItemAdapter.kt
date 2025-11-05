@@ -3,15 +3,16 @@ package com.example.rsrpanalyzer.view.signal
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.rsrpanalyzer.data.model.SignalRecord
 import com.example.rsrpanalyzer.databinding.ItemSignalRecordBinding
 
-class SignalRecordAdapter : RecyclerView.Adapter<SignalRecordAdapter.SignalRecordViewHolder>() {
+class SignalRecordItemAdapter :
+    RecyclerView.Adapter<SignalRecordItemAdapter.SignalRecordViewHolder>() {
 
-    private val records = mutableListOf<SignalRecord>()
+    private val records = mutableListOf<SignalRecordItem>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SignalRecordViewHolder {
-        val binding = ItemSignalRecordBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemSignalRecordBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return SignalRecordViewHolder(binding)
     }
 
@@ -21,18 +22,20 @@ class SignalRecordAdapter : RecyclerView.Adapter<SignalRecordAdapter.SignalRecor
 
     override fun getItemCount(): Int = records.size
 
-    fun addRecord(record: SignalRecord) {
+    fun addRecordItem(record: SignalRecordItem) {
         records.add(0, record) // 맨 위에 추가
         notifyItemInserted(0)
     }
 
-    fun clearRecords() {
+    fun clearRecordItems() {
+        val size = records.size
         records.clear()
-        notifyDataSetChanged()
+        notifyItemRangeRemoved(0, size)
     }
 
-    class SignalRecordViewHolder(private val binding: ItemSignalRecordBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(record: SignalRecord) {
+    class SignalRecordViewHolder(private val binding: ItemSignalRecordBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(record: SignalRecordItem) {
             binding.itemLatitude.text = String.format("%.6f", record.latitude)
             binding.itemLongitude.text = String.format("%.6f", record.longitude)
             binding.itemRsrp.text = record.rsrp.toString()

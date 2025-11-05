@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.rsrpanalyzer.R
-import com.example.rsrpanalyzer.data.model.SignalRecord
 import com.example.rsrpanalyzer.databinding.FragmentTableViewBinding
 import com.example.rsrpanalyzer.viewmodel.RecordViewModel
 import com.example.rsrpanalyzer.viewmodel.SignalViewModel
@@ -22,7 +21,7 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
     private val signalViewModel: SignalViewModel by activityViewModels()
     private val recordViewModel: RecordViewModel by activityViewModels()
 
-    private lateinit var signalRecordAdapter: SignalRecordAdapter
+    private lateinit var signalRecordItemAdapter: SignalRecordItemAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,9 +38,9 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
     }
 
     private fun setupRecyclerView() {
-        signalRecordAdapter = SignalRecordAdapter()
+        signalRecordItemAdapter = SignalRecordItemAdapter()
         binding.rvSignalHistory.apply {
-            adapter = signalRecordAdapter
+            adapter = signalRecordItemAdapter
             layoutManager = LinearLayoutManager(context)
         }
     }
@@ -57,14 +56,13 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
                 val rsrp = signalViewModel.rsrp.value ?: Int.MIN_VALUE
                 val rsrq = signalViewModel.rsrq.value ?: Int.MIN_VALUE
                 if (rsrp != Int.MIN_VALUE) { // 유효한 신호 값이 있을 때만 기록
-                    val record = SignalRecord(
-                        sessionId = 0, // 임시 ID
+                    val recordItem = SignalRecordItem(
                         latitude = location.latitude,
                         longitude = location.longitude,
                         rsrp = rsrp,
                         rsrq = rsrq
                     )
-                    signalRecordAdapter.addRecord(record)
+                    signalRecordItemAdapter.addRecordItem(recordItem)
                 }
             }
         }
@@ -80,7 +78,7 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
         // 녹화 상태 변경 시 목록 초기화
         recordViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
             Log.d("TableViewFragment", "Recording state changed: $isRecording. Clearing records.")
-            signalRecordAdapter.clearRecords()
+            signalRecordItemAdapter.clearRecordItems()
         }
     }
 

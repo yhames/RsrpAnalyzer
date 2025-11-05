@@ -50,8 +50,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     private val bitmapCache = mutableMapOf<Int, Bitmap>()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMapViewBinding.inflate(inflater, container, false)
         KakaoMapSdk.init(requireContext(), BuildConfig.KAKAO_NATIVE_APP_KEY)
@@ -92,19 +91,13 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
                 labelLayer?.remove(*recordLabels.toTypedArray())
                 recordLabels.clear()
             }
-
-            if (isRecording) {
-                // 녹화가 '시작'되는 경우, 실시간 위치를 나타내는 원을 숨깁니다.
-                positionLabel?.remove()
-                positionLabel = null
-            }
         }
 
         signalViewModel.location.observe(viewLifecycleOwner) { loc ->
             if (recordViewModel.isRecording.value == true) {
-                addRecordCircle(loc)
+                addRecordedLocation(loc)
             } else {
-                updateLiveLocation(loc)
+                updateCurrentLocation(loc)
             }
         }
         signalViewModel.rsrp.observe(viewLifecycleOwner) { rsrp ->
@@ -115,7 +108,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         }
     }
 
-    private fun addRecordCircle(location: Location) {
+    private fun addRecordedLocation(location: Location) {
         if (!isAdded) return
         val layer = labelLayer ?: return
         val manager = labelManager ?: return
@@ -131,7 +124,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         map.moveCamera(cameraUpdate)
     }
 
-    private fun updateLiveLocation(location: Location) {
+    private fun updateCurrentLocation(location: Location) {
         if (!isAdded) return
         val map = kakaoMap ?: return
         val layer = labelLayer ?: return
@@ -161,7 +154,8 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         if (recordViewModel.isRecording.value != true) {
             positionLabel?.let { label ->
                 try {
-                    val styles = labelManager?.addLabelStyles(LabelStyles.from(createRsrpLabelStyle()))
+                    val styles =
+                        labelManager?.addLabelStyles(LabelStyles.from(createRsrpLabelStyle()))
                     styles?.let { label.changeStyles(it) }
                 } catch (e: Exception) {
                     Log.e("MapController", "Error updating signal strength", e)
