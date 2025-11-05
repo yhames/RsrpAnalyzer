@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rsrpanalyzer.databinding.ItemSignalRecordBinding
+import java.util.Locale
 
 class SignalRecordItemAdapter :
     RecyclerView.Adapter<SignalRecordItemAdapter.SignalRecordViewHolder>() {
@@ -36,8 +37,8 @@ class SignalRecordItemAdapter :
     class SignalRecordViewHolder(private val binding: ItemSignalRecordBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(record: SignalRecordItem) {
-            binding.itemLatitude.text = String.format("%.6f", record.latitude)
-            binding.itemLongitude.text = String.format("%.6f", record.longitude)
+            binding.itemLatitude.text = String.format(Locale.US, "%.6f", record.latitude)
+            binding.itemLongitude.text = String.format(Locale.US, "%.6f", record.longitude)
             binding.itemRsrp.text = record.rsrp.toString()
             binding.itemRsrq.text = record.rsrq.toString()
         }
