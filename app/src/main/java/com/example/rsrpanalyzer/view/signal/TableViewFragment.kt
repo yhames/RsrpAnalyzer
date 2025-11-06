@@ -10,16 +10,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.rsrpanalyzer.R
 import com.example.rsrpanalyzer.databinding.FragmentTableViewBinding
-import com.example.rsrpanalyzer.viewmodel.RecordViewModel
-import com.example.rsrpanalyzer.viewmodel.SignalViewModel
+import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel
+import com.example.rsrpanalyzer.viewmodel.CurrentSignalViewModel
 
 class TableViewFragment : Fragment(R.layout.fragment_table_view) {
 
     private var _binding: FragmentTableViewBinding? = null
     private val binding get() = _binding!!
 
-    private val signalViewModel: SignalViewModel by activityViewModels()
-    private val recordViewModel: RecordViewModel by activityViewModels()
+    private val currentSignalViewModel: CurrentSignalViewModel by activityViewModels()
+    private val recordStatusViewModel: RecordStatusViewModel by activityViewModels()
 
     private lateinit var signalRecordItemAdapter: SignalRecordItemAdapter
 
@@ -47,14 +47,14 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
 
     private fun observeViewModels() {
         // 현재 값 업데이트
-        signalViewModel.location.observe(viewLifecycleOwner) { location ->
+        currentSignalViewModel.location.observe(viewLifecycleOwner) { location ->
             binding.tvLatitude.text = getString(R.string.latitude_value, location.latitude)
             binding.tvLongitude.text = getString(R.string.longitude_value, location.longitude)
 
             // 녹화 중일 때만 기록 추가
-            if (recordViewModel.isRecording.value == true) {
-                val rsrp = signalViewModel.rsrp.value ?: Int.MIN_VALUE
-                val rsrq = signalViewModel.rsrq.value ?: Int.MIN_VALUE
+            if (recordStatusViewModel.isRecording.value == true) {
+                val rsrp = currentSignalViewModel.rsrp.value ?: Int.MIN_VALUE
+                val rsrq = currentSignalViewModel.rsrq.value ?: Int.MIN_VALUE
                 if (rsrp != Int.MIN_VALUE) { // 유효한 신호 값이 있을 때만 기록
                     val recordItem = SignalRecordItem(
                         latitude = location.latitude,
@@ -67,16 +67,16 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
             }
         }
 
-        signalViewModel.rsrp.observe(viewLifecycleOwner) { rsrp ->
+        currentSignalViewModel.rsrp.observe(viewLifecycleOwner) { rsrp ->
             binding.tvRsrpTable.text = getString(R.string.rsrp_value_simple, rsrp)
         }
 
-        signalViewModel.rsrq.observe(viewLifecycleOwner) { rsrq ->
+        currentSignalViewModel.rsrq.observe(viewLifecycleOwner) { rsrq ->
             binding.tvRsrqTable.text = getString(R.string.rsrq_value_simple, rsrq)
         }
 
         // 녹화 상태 변경 시 목록 초기화
-        recordViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
+        recordStatusViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
             Log.d("TableViewFragment", "Recording state changed: $isRecording. Clearing records.")
             signalRecordItemAdapter.clearRecordItems()
         }

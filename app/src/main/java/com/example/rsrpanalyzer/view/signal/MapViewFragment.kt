@@ -16,8 +16,8 @@ import com.example.rsrpanalyzer.BuildConfig
 import com.example.rsrpanalyzer.R
 import com.example.rsrpanalyzer.databinding.FragmentMapViewBinding
 import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
-import com.example.rsrpanalyzer.viewmodel.RecordViewModel
-import com.example.rsrpanalyzer.viewmodel.SignalViewModel
+import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel
+import com.example.rsrpanalyzer.viewmodel.CurrentSignalViewModel
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.KakaoMapSdk
@@ -37,8 +37,8 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     private var _binding: FragmentMapViewBinding? = null
     private val binding get() = _binding!!
 
-    private val signalViewModel: SignalViewModel by activityViewModels()
-    private val recordViewModel: RecordViewModel by activityViewModels()
+    private val currentSignalViewModel: CurrentSignalViewModel by activityViewModels()
+    private val recordStatusViewModel: RecordStatusViewModel by activityViewModels()
 
     private var kakaoMap: KakaoMap? = null
     private var labelManager: LabelManager? = null
@@ -85,7 +85,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     }
 
     private fun observeViewModels() {
-        recordViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
+        recordStatusViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
             // 녹화 상태가 변경될 때마다, 이전에 기록된 원들을 항상 삭제합니다.
             if (recordLabels.isNotEmpty()) {
                 labelLayer?.remove(*recordLabels.toTypedArray())
@@ -93,17 +93,17 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             }
         }
 
-        signalViewModel.location.observe(viewLifecycleOwner) { loc ->
-            if (recordViewModel.isRecording.value == true) {
+        currentSignalViewModel.location.observe(viewLifecycleOwner) { loc ->
+            if (recordStatusViewModel.isRecording.value == true) {
                 addRecordedLocation(loc)
             } else {
                 updateCurrentLocation(loc)
             }
         }
-        signalViewModel.rsrp.observe(viewLifecycleOwner) { rsrp ->
+        currentSignalViewModel.rsrp.observe(viewLifecycleOwner) { rsrp ->
             updateRsrp(rsrp)
         }
-        signalViewModel.rsrq.observe(viewLifecycleOwner) { rsrq ->
+        currentSignalViewModel.rsrq.observe(viewLifecycleOwner) { rsrq ->
             updateRsrq(rsrq)
         }
     }
@@ -151,7 +151,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         binding.tvRsrp.text = getString(R.string.rsrp_value, rsrp, rsrpLabel)
 
         // 녹화 중이 아닐 때만 실시간 라벨 색상 업데이트
-        if (recordViewModel.isRecording.value != true) {
+        if (recordStatusViewModel.isRecording.value != true) {
             positionLabel?.let { label ->
                 try {
                     val styles =

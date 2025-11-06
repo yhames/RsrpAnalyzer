@@ -15,15 +15,15 @@ import com.example.rsrpanalyzer.data.model.SignalRecord
 import com.example.rsrpanalyzer.data.repository.SignalRepository
 import com.example.rsrpanalyzer.databinding.FragmentRecordControlBinding
 import com.example.rsrpanalyzer.model.record.RecordManager
-import com.example.rsrpanalyzer.viewmodel.RecordViewModel
-import com.example.rsrpanalyzer.viewmodel.SignalViewModel
+import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel
+import com.example.rsrpanalyzer.viewmodel.CurrentSignalViewModel
 
 class RecordControlFragment : Fragment() {
     private var _binding: FragmentRecordControlBinding? = null
     private val binding get() = _binding!!
 
-    private val recordViewModel: RecordViewModel by activityViewModels()
-    private val signalViewModel: SignalViewModel by activityViewModels()
+    private val recordStatusViewModel: RecordStatusViewModel by activityViewModels()
+    private val currentSignalViewModel: CurrentSignalViewModel by activityViewModels()
     private lateinit var recordManager: RecordManager
 
     override fun onCreateView(
@@ -50,7 +50,7 @@ class RecordControlFragment : Fragment() {
     }
 
     private fun setupRecordManager() {
-        recordViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
+        recordStatusViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
             if (isRecording) {
                 binding.btnRecord.text = this.getString(R.string.session_stop_recording)
             } else {
@@ -59,9 +59,9 @@ class RecordControlFragment : Fragment() {
         }
 
         binding.btnRecord.setOnClickListener {
-            if (recordViewModel.isRecording.value == true) {
+            if (recordStatusViewModel.isRecording.value == true) {
                 recordManager.stopRecording()
-                recordViewModel.updateRecordingStatus(false)
+                recordStatusViewModel.updateRecordingStatus(false)
             } else {
                 showSessionNameDialog()
             }
@@ -80,8 +80,8 @@ class RecordControlFragment : Fragment() {
             val sessionName = input.text.toString()
                 .ifBlank { "Session_${System.currentTimeMillis()}" }
             recordManager.startRecording(sessionName)
-            recordViewModel.updateSessionName(sessionName)
-            recordViewModel.updateRecordingStatus(true)
+            recordStatusViewModel.updateSessionName(sessionName)
+            recordStatusViewModel.updateRecordingStatus(true)
         }
         builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
             dialog.cancel()
@@ -91,17 +91,17 @@ class RecordControlFragment : Fragment() {
     }
 
     private fun observeSignalsForRecording() {
-        signalViewModel.location.observe(viewLifecycleOwner) { location ->
+        currentSignalViewModel.location.observe(viewLifecycleOwner) { location ->
 
-            val rsrp = signalViewModel.rsrp.value ?: run {
+            val rsrp = currentSignalViewModel.rsrp.value ?: run {
                 Log.d("RecordControlFragment", "No rsrp value")
                 return@observe
             }
-            val rsrq = signalViewModel.rsrq.value ?: run {
+            val rsrq = currentSignalViewModel.rsrq.value ?: run {
                 Log.d("RecordControlFragment", "No rsrq value")
                 return@observe
             }
-            if (recordViewModel.isRecording()) {
+            if (recordStatusViewModel.isRecording()) {
                 val sessionId = recordManager.getCurrentSessionId() ?: run {
                     Log.w("RecordControlFragment", "No active recording session")
                     return@observe

@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class SignalViewModel : ViewModel() {
+class CurrentSignalViewModel : ViewModel() {
     private val _location = MutableLiveData<Location>()
     val location: LiveData<Location> = _location
 

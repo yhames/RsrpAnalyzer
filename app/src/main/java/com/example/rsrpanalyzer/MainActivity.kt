@@ -16,15 +16,15 @@ import com.example.rsrpanalyzer.model.signal.SignalMonitor
 import com.example.rsrpanalyzer.view.record.RecordControlFragment
 import com.example.rsrpanalyzer.view.signal.MapViewFragment
 import com.example.rsrpanalyzer.view.signal.TableViewFragment
-import com.example.rsrpanalyzer.viewmodel.RecordViewModel
-import com.example.rsrpanalyzer.viewmodel.SignalViewModel
+import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel
+import com.example.rsrpanalyzer.viewmodel.CurrentSignalViewModel
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val signalViewModel: SignalViewModel by viewModels()
-    private val recordViewModel: RecordViewModel by viewModels()
+    private val currentSignalViewModel: CurrentSignalViewModel by viewModels()
+    private val recordStatusViewModel: RecordStatusViewModel by viewModels()
 
     private lateinit var locationTracker: LocationTracker
     private lateinit var signalMonitor: SignalMonitor
@@ -106,10 +106,10 @@ class MainActivity : AppCompatActivity() {
     private fun startTracking() {
         if (isTracking.compareAndSet(false, true)) {
             locationTracker.start { location ->
-                signalViewModel.updateLocation(location)
+                currentSignalViewModel.updateLocation(location)
             }
             signalMonitor.start { rsrp, rsrq ->
-                signalViewModel.updateSignal(rsrp, rsrq)
+                currentSignalViewModel.updateSignal(rsrp, rsrq)
             }
         }
     }
@@ -137,10 +137,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        recordViewModel.isRecording.observe(this) { isRecording ->
+        recordStatusViewModel.isRecording.observe(this) { isRecording ->
             binding.tvRecordingStatus.visibility = if (isRecording) View.VISIBLE else View.GONE
         }
-        recordViewModel.sessionName.observe(this) { sessionName ->
+        recordStatusViewModel.sessionName.observe(this) { sessionName ->
             binding.tvRecordingStatus.text = getString(R.string.session_recording_status, sessionName)
         }
     }

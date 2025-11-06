@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class RecordViewModel : ViewModel() {
+class RecordStatusViewModel : ViewModel() {
     private val _isRecording = MutableLiveData(false)
     val isRecording: LiveData<Boolean> get() = _isRecording
 
