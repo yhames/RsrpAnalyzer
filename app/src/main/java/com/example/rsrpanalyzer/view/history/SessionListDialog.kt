@@ -3,6 +3,7 @@ package com.example.rsrpanalyzer.view.history
 import android.app.Dialog
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -225,9 +226,12 @@ class SessionListDialog : DialogFragment() {
                     CsvHelper.exportToCsv(records, outputStream)
                 }
 
+                // 파일명 추출
+                val fileName = getFileNameFromUri(uri) ?: "파일"
+
                 Toast.makeText(
                     requireContext(),
-                    getString(R.string.session_export_success, uri.lastPathSegment),
+                    getString(R.string.session_export_success, fileName),
                     Toast.LENGTH_LONG
                 ).show()
             } catch (_: Exception) {
@@ -275,8 +279,12 @@ class SessionListDialog : DialogFragment() {
     }
 
     private fun showSessionNameInputDialog(records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>) {
+        val defaultName = getString(
+            R.string.session_import_default_name,
+            formatDateForFilename(System.currentTimeMillis())
+        )
         val editText = EditText(requireContext()).apply {
-            setText("Imported_${formatDateForFilename(System.currentTimeMillis())}")
+            setText(defaultName)
             setSingleLine()
         }
 
@@ -358,6 +366,17 @@ class SessionListDialog : DialogFragment() {
     private fun formatDateForFilename(timestamp: Long): String {
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
         return dateFormat.format(Date(timestamp))
+    }
+
+    private fun getFileNameFromUri(uri: Uri): String? {
+        var fileName: String? = null
+        requireContext().contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1 && cursor.moveToFirst()) {
+                fileName = cursor.getString(nameIndex)
+            }
+        }
+        return fileName
     }
 
     override fun onDestroyView() {
