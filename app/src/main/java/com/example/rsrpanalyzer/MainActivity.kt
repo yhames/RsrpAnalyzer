@@ -17,8 +17,8 @@ import com.example.rsrpanalyzer.view.history.SessionListDialog
 import com.example.rsrpanalyzer.view.record.RecordControlFragment
 import com.example.rsrpanalyzer.view.signal.MapViewFragment
 import com.example.rsrpanalyzer.view.signal.TableViewFragment
-import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel
 import com.example.rsrpanalyzer.viewmodel.CurrentSignalViewModel
+import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel
 import com.example.rsrpanalyzer.viewmodel.SessionDataViewModel
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -151,17 +151,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showSessionListDialog() {
-        val dialog = SessionListDialog.newInstance { sessionItem ->
-            // 세션 선택 시
-            sessionDataViewModel.selectSession(sessionItem)
-            sessionDataViewModel.setHistoryMode(true)
+        val dialog = SessionListDialog.newInstance(
+            onSessionSelected = { sessionItem ->
+                // 세션 선택 시
+                sessionDataViewModel.selectSession(sessionItem)
+                sessionDataViewModel.setHistoryMode(true)
 
-            // RecordControl 숨김 (이전 기록 보기 모드)
-            binding.recordControlContainer.visibility = View.GONE
+                // RecordControl 숨김 (이전 기록 보기 모드)
+                binding.recordControlContainer.visibility = View.GONE
 
-            // 지도보기로 자동 전환
-            binding.bottomNavigation.selectedItemId = R.id.navigation_map
-        }
+                // 지도보기로 자동 전환
+                binding.bottomNavigation.selectedItemId = R.id.navigation_map
+            },
+            onDialogDismissed = {
+                // 세션이 선택되지 않고 취소된 경우
+                // 이전 기록 보기 상태가 아니었다면 실시간 보기로 복원
+                if (sessionDataViewModel.isHistoryMode.value != true) {
+                    binding.bottomNavigation.selectedItemId = R.id.navigation_realtime
+                }
+            }
+        )
         dialog.show(supportFragmentManager, SessionListDialog.TAG)
     }
 

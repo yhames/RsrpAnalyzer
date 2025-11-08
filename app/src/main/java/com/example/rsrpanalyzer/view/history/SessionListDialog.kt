@@ -33,7 +33,9 @@ class SessionListDialog : DialogFragment() {
 
     private lateinit var sessionHistoryAdapter: SessionHistoryAdapter
     private var onSessionSelected: ((SessionItem) -> Unit)? = null
+    private var onDialogDismissed: (() -> Unit)? = null
     private var currentExportSessionId: Long? = null
+    private var sessionWasSelected = false
 
     // CSV 내보내기를 위한 파일 생성 launcher
     private val createCsvLauncher = registerForActivityResult(
@@ -73,6 +75,7 @@ class SessionListDialog : DialogFragment() {
     private fun setupRecyclerView() {
         sessionHistoryAdapter = SessionHistoryAdapter(
             onSessionClick = { sessionItem ->
+                sessionWasSelected = true
                 onSessionSelected?.invoke(sessionItem)
                 dismiss()
             },
@@ -121,6 +124,10 @@ class SessionListDialog : DialogFragment() {
 
     fun setOnSessionSelectedListener(listener: (SessionItem) -> Unit) {
         onSessionSelected = listener
+    }
+
+    fun setOnDialogDismissedListener(listener: () -> Unit) {
+        onDialogDismissed = listener
     }
 
     private fun showEditSessionDialog(sessionItem: SessionItem) {
@@ -379,6 +386,14 @@ class SessionListDialog : DialogFragment() {
         return fileName
     }
 
+    override fun onDismiss(dialog: android.content.DialogInterface) {
+        super.onDismiss(dialog)
+        // 세션이 선택되지 않았으면 dismiss 콜백 호출
+        if (!sessionWasSelected) {
+            onDialogDismissed?.invoke()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -387,9 +402,13 @@ class SessionListDialog : DialogFragment() {
     companion object {
         const val TAG = "SessionListDialog"
 
-        fun newInstance(onSessionSelected: (SessionItem) -> Unit): SessionListDialog {
+        fun newInstance(
+            onSessionSelected: (SessionItem) -> Unit,
+            onDialogDismissed: (() -> Unit)? = null
+        ): SessionListDialog {
             return SessionListDialog().apply {
                 setOnSessionSelectedListener(onSessionSelected)
+                onDialogDismissed?.let { setOnDialogDismissedListener(it) }
             }
         }
     }
