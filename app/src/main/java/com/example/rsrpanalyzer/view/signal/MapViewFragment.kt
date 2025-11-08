@@ -286,13 +286,13 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             val rsrpLevel = SignalStrengthHelper.getRsrpLevel(record.rsrp)
             val baseColor = requireContext().getColor(rsrpLevel.color)
             
-            // 반투명 색상으로 변환 (알파값 50%)
-            val alpha = 128 // 0-255 범위, 128은 약 50%
+            // 반투명 색상으로 변환 (알파값 35%)
+            val alpha = (255 * 0.35).toInt() // 0-255 범위
             val transparentColor = (alpha shl 24) or (baseColor and 0x00FFFFFF)
             
             // 큰 원 생성 (히트맵 효과)
             val largeBitmap = bitmapCache.getOrPut(transparentColor) {
-                createColoredCircleBitmap(transparentColor, 80, 1.0f) // 크기 80, factor 1.0
+                createColoredCircleBitmap(transparentColor, 50, 1.0f) // 크기 80, factor 1.0
             }
             
             val labelStyle = LabelStyle.from(largeBitmap).setAnchorPoint(0.5f, 0.5f)
