@@ -255,27 +255,47 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
 
     private fun displaySessionRecords(records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>) {
         if (!isAdded) return
-        val layer = labelLayer ?: return
-        val manager = labelManager ?: return
         val map = kakaoMap ?: return
 
         // 기존 라벨 제거
         if (recordLabels.isNotEmpty()) {
-            layer.remove(*recordLabels.toTypedArray())
+            labelLayer?.remove(*recordLabels.toTypedArray())
             recordLabels.clear()
         }
+        
+        // 히트맵 스타일로 원을 그림 (크고 반투명한 원)
+        drawHeatmapCircles(records, map)
 
-        // 세션 기록을 지도에 표시
+        // 신호 패널 업데이트 - 이전 기록 모드이므로 placeholder 표시
+        binding.tvStatus.text = getString(R.string.session_history_viewing)
+        binding.tvRsrp.text = getString(R.string.rsrp_value_placeholder)
+        binding.tvRsrq.text = getString(R.string.rsrq_value_placeholder)
+    }
+
+    private fun drawHeatmapCircles(
+        records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>,
+        map: KakaoMap
+    ) {
+        val layer = labelLayer ?: return
+        val manager = labelManager ?: return
+
         records.forEach { record ->
             val position = LatLng.from(record.latitude, record.longitude)
             
             // RSRP 기준으로 색상 결정
             val rsrpLevel = SignalStrengthHelper.getRsrpLevel(record.rsrp)
-            val color = requireContext().getColor(rsrpLevel.color)
-            val bitmap = bitmapCache.getOrPut(color) {
-                createColoredCircleBitmap(color, 40)
+            val baseColor = requireContext().getColor(rsrpLevel.color)
+            
+            // 반투명 색상으로 변환 (알파값 50%)
+            val alpha = 128 // 0-255 범위, 128은 약 50%
+            val transparentColor = (alpha shl 24) or (baseColor and 0x00FFFFFF)
+            
+            // 큰 원 생성 (히트맵 효과)
+            val largeBitmap = bitmapCache.getOrPut(transparentColor) {
+                createColoredCircleBitmap(transparentColor, 80, 1.0f) // 크기 80, factor 1.0
             }
-            val labelStyle = LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
+            
+            val labelStyle = LabelStyle.from(largeBitmap).setAnchorPoint(0.5f, 0.5f)
             val styles = manager.addLabelStyles(LabelStyles.from(labelStyle))
             val options = LabelOptions.from(position).setStyles(styles)
             val label = layer.addLabel(options)
@@ -289,10 +309,5 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             val cameraUpdate = CameraUpdateFactory.newCenterPosition(position)
             map.moveCamera(cameraUpdate)
         }
-
-        // 신호 패널 업데이트 - 이전 기록 모드이므로 placeholder 표시
-        binding.tvStatus.text = getString(R.string.session_history_viewing)
-        binding.tvRsrp.text = getString(R.string.rsrp_value_placeholder)
-        binding.tvRsrq.text = getString(R.string.rsrq_value_placeholder)
     }
 }
