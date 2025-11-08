@@ -101,32 +101,34 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             } else {
                 // 실시간 모드로 복귀
                 binding.tvStatus.text = getString(R.string.signal_measuring_status)
-                
+
                 // 히스토리 라벨 제거
                 if (recordLabels.isNotEmpty()) {
                     labelLayer?.remove(*recordLabels.toTypedArray())
                     recordLabels.clear()
                 }
-                
+
                 // 현재 신호 값 복원
                 currentSignalViewModel.rsrp.value?.let { rsrp ->
-                    val rsrpLabel = getString(SignalStrengthHelper.getRsrpLevel(rsrp).labelResourceId)
+                    val rsrpLabel =
+                        getString(SignalStrengthHelper.getRsrpLevel(rsrp).labelResourceId)
                     binding.tvRsrp.text = getString(R.string.rsrp_value, rsrp, rsrpLabel)
                 }
                 currentSignalViewModel.rsrq.value?.let { rsrq ->
-                    val rsrqLabel = getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)
+                    val rsrqLabel =
+                        getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)
                     binding.tvRsrq.text = getString(R.string.rsrq_value, rsrq, rsrqLabel)
                 }
             }
         }
-        
+
         // 세션 기록 데이터 로드
         sessionDataViewModel.sessionRecords.observe(viewLifecycleOwner) { records ->
             if (sessionDataViewModel.isHistoryMode.value == true && records.isNotEmpty()) {
                 displaySessionRecords(records)
             }
         }
-        
+
         recordStatusViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
             // 녹화 상태가 변경될 때마다, 이전에 기록된 원들을 항상 삭제합니다.
             if (recordLabels.isNotEmpty()) {
@@ -224,18 +226,22 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     private fun createRsrpLabelStyle(): LabelStyle {
         val rsrpLevel = SignalStrengthHelper.getRsrpLevel(currentRsrp.get())
         val baseColor = requireContext().getColor(rsrpLevel.color)
-        
+
         // 반투명 색상으로 변환 (알파값 35%)
         val alpha = (255 * 0.35).toInt()
         val transparentColor = (alpha shl 24) or (baseColor and 0x00FFFFFF)
-        
+
         val bitmap = bitmapCache.getOrPut(transparentColor) {
             createColoredCircleBitmap(transparentColor, 50, 1.0f)
         }
         return LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
     }
 
-    private fun createColoredCircleBitmap(color: Int, size: Int, factor: Float = 1.3f): Bitmap {
+    private fun createColoredCircleBitmap(
+        color: Int,
+        size: Int = 50,
+        factor: Float = 1.0f
+    ): Bitmap {
         val bitmap = createBitmap(size, size)
         val canvas = Canvas(bitmap)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -267,7 +273,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             labelLayer?.remove(*recordLabels.toTypedArray())
             recordLabels.clear()
         }
-        
+
         // 히트맵 스타일로 원을 그림 (크고 반투명한 원)
         drawHeatmapCircles(records, map)
 
@@ -286,20 +292,20 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
 
         records.forEach { record ->
             val position = LatLng.from(record.latitude, record.longitude)
-            
+
             // RSRP 기준으로 색상 결정
             val rsrpLevel = SignalStrengthHelper.getRsrpLevel(record.rsrp)
             val baseColor = requireContext().getColor(rsrpLevel.color)
-            
+
             // 반투명 색상으로 변환 (알파값 35%)
             val alpha = (255 * 0.35).toInt() // 0-255 범위
             val transparentColor = (alpha shl 24) or (baseColor and 0x00FFFFFF)
-            
+
             // 큰 원 생성 (히트맵 효과)
             val largeBitmap = bitmapCache.getOrPut(transparentColor) {
                 createColoredCircleBitmap(transparentColor, 50, 1.0f) // 크기 80, factor 1.0
             }
-            
+
             val labelStyle = LabelStyle.from(largeBitmap).setAnchorPoint(0.5f, 0.5f)
             val styles = manager.addLabelStyles(LabelStyles.from(labelStyle))
             val options = LabelOptions.from(position).setStyles(styles)
