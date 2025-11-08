@@ -175,12 +175,10 @@ CREATE INDEX IF NOT EXISTS index_signal_records_sessionId ON signal_records(sess
 
 ## CSV Format
 
-[//]: # (Add CSV Format Exmaples)
-
 ### schema
 
 ```csv
-recordId,sessionId,sessionName,sessionCreatedAt,timestampMillis,latitude,longitude,rsrp,rsrq
+timestampMillis,latitude,longitude,rsrp,rsrq
 ```
 
 | 컬럼 이름           | 설명                                                                     |
