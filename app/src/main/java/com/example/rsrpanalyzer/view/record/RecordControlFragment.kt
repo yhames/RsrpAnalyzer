@@ -9,6 +9,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.example.rsrpanalyzer.MainActivity
 import com.example.rsrpanalyzer.R
 import com.example.rsrpanalyzer.persistence.db.DatabaseProvider
 import com.example.rsrpanalyzer.persistence.model.SignalRecord
@@ -65,6 +66,11 @@ class RecordControlFragment : Fragment() {
             } else {
                 showSessionNameDialog()
             }
+        }
+
+        // 수동 측정 버튼
+        binding.btnManualMeasure.setOnClickListener {
+            (activity as? MainActivity)?.requestManualMeasurement()
         }
     }
 

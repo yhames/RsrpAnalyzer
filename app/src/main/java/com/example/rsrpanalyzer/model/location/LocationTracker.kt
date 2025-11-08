@@ -28,6 +28,18 @@ class LocationTracker(private val context: Context) {
         fusedClient.requestLocationUpdates(request, callback!!, context.mainLooper)
     }
 
+    /**
+     * 현재 위치 즉시 조회 (수동 측정용)
+     */
+    @SuppressLint("MissingPermission")
+    fun getCurrentLocation(onLocation: (Location?) -> Unit) {
+        fusedClient.lastLocation.addOnSuccessListener { location ->
+            onLocation(location)
+        }.addOnFailureListener {
+            onLocation(null)
+        }
+    }
+
     fun stop() {
         callback?.let { fusedClient.removeLocationUpdates(it) }
     }

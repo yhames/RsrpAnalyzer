@@ -162,6 +162,42 @@ class SignalMonitor(private val context: Context) {
         }
     }
 
+    /**
+     * 수동으로 즉시 신호 측정 (사용자 요청)
+     * @return Pair<RSRP, RSRQ> 또는 null (측정 실패 시)
+     */
+    @SuppressLint("MissingPermission")
+    fun measureNow(): Pair<Int, Int>? {
+        return try {
+            val cellInfo = telephonyManager.allCellInfo
+            if (cellInfo != null) {
+                val info = cellInfo.filterIsInstance<CellInfoLte>().firstOrNull { it.isRegistered }
+                info?.cellSignalStrength?.let { signalStrength ->
+                    val rsrp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        signalStrength.rsrp
+                    } else {
+                        extractRsrpReflection(signalStrength)
+                    }
+
+                    val rsrq = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        signalStrength.rsrq
+                    } else {
+                        extractRsrqReflection(signalStrength)
+                    }
+
+                    if (rsrp != null && rsrq != null) {
+                        Log.d(TAG, "Manual measurement: RSRP=$rsrp, RSRQ=$rsrq")
+                        return Pair(rsrp, rsrq)
+                    }
+                }
+            }
+            null
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to measure manually", e)
+            null
+        }
+    }
+
     fun stop() {
         // 폴링 중지
         pollingRunnable?.let { pollingHandler?.removeCallbacks(it) }

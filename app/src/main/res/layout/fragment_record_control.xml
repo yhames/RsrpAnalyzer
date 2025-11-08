@@ -14,4 +14,13 @@
         android:text="@string/session_start_recording"
         android:textColor="@android:color/black" />
 
+    <Button
+        android:id="@+id/btn_manual_measure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="?attr/colorSecondary"
+        android:text="@string/manual_measure"
+        android:textColor="@android:color/black" />
+
 </LinearLayout>

@@ -59,5 +59,6 @@
     <string name="session_import_invalid_format">올바른 CSV 형식이 아닙니다.\n필수 컬럼: timestamp, latitude, longitude, rsrp, rsrq</string>
     <string name="session_import_session_name">불러온 세션 이름</string>
     <string name="session_import_default_name">Imported_%s</string>
+    <string name="manual_measure">수동 측정</string>
 
 </resources>

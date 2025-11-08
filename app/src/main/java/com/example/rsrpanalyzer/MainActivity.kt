@@ -124,6 +124,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 수동 측정 요청 (외부에서 호출 가능)
+     */
+    fun requestManualMeasurement() {
+        if (!isTracking.get()) {
+            Toast.makeText(this, "측정이 활성화되지 않았습니다", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 1. 현재 위치 즉시 조회
+        locationTracker.getCurrentLocation { location ->
+            if (location == null) {
+                Toast.makeText(this, "위치 정보를 가져올 수 없습니다", Toast.LENGTH_SHORT).show()
+                return@getCurrentLocation
+            }
+
+            // 2. 신호 즉시 측정
+            val signalData = signalMonitor.measureNow()
+            if (signalData != null) {
+                val (rsrp, rsrq) = signalData
+                
+                // 3. ViewModel 업데이트 (위치 + 신호)
+                currentSignalViewModel.updateLocation(location)
+                currentSignalViewModel.updateSignal(rsrp, rsrq)
+                
+                Toast.makeText(
+                    this,
+                    "수동 측정 완료\nRSRP=$rsrp, RSRQ=$rsrq",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(this, "신호 측정 실패", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun setupBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
