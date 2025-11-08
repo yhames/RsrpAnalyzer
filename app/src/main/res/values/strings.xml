@@ -9,12 +9,12 @@
     <string name="rsrp_value_simple">RSRP: %d</string>
     <string name="rsrq_value_simple">RSRQ: %d</string>
 
-    <string name="latitude_placeholder">Lat: --</string>
-    <string name="longitude_placeholder">Lon: --</string>
+    <string name="latitude_placeholder">Lat: —</string>
+    <string name="longitude_placeholder">Lon: —</string>
     <string name="latitude_value">Lat: %.6f</string>
     <string name="longitude_value">Lon: %.6f</string>
-    <string name="rsrp_placeholder">RSRP: --</string>
-    <string name="rsrq_placeholder">RSRQ: --</string>
+    <string name="rsrp_placeholder">RSRP: —</string>
+    <string name="rsrq_placeholder">RSRQ: —</string>
 
     <string name="map_view">지도 보기</string>
     <string name="data_view">데이터 보기</string>
@@ -38,5 +38,9 @@
 
     <string name="session_tv_status_idle">기록 가능</string>
     <string name="session_tv_status_ongoing">기록중</string>
+
+    <string name="session_history_title">이전 기록</string>
+    <string name="session_history_empty">저장된 세션이 없습니다.</string>
+    <string name="session_record_count">기록 수: %d개</string>
 
 </resources>
