@@ -177,25 +177,21 @@ CREATE INDEX IF NOT EXISTS index_signal_records_sessionId ON signal_records(sess
 recordId,sessionId,sessionName,sessionCreatedAt,timestampMillis,latitude,longitude,rsrp,rsrq
 ```
 
-| 컬럼 이름            | 설명                                                                     |
-|------------------|------------------------------------------------------------------------|
-| recordId         | 신호 기록 고유 ID (`signal_records.id`)                                      |
-| sessionId        | 세션 고유 ID (`signal_sessions.id`)                                        |
-| sessionName      | 세션 이름 (`signal_sessions.sessionName`)                                  |
-| sessionCreatedAt | 세션 생성 시각 (epoch millis, `signal_sessions.createdAt`)                   |
-| timestampMillis  | 신호 기록 시각 (epoch millis, `signal_records.timestampMillis`)              |
-| latitude         | 기록 당시 위도 (`signal_records.latitude`)                                   |
-| longitude        | 기록 당시 경도 (`signal_records.longitude`)                                  |
-| rsrp             | LTE 신호 세기 (Reference Signal Received Power) (`signal_records.rsrp`)    |
-| rsrq             | LTE 신호의 품질 (Reference Signal Received Quality) (`signal_records.rsrq`) |
+| 컬럼 이름           | 설명                                                                     |
+|-----------------|------------------------------------------------------------------------|
+| timestampMillis | 신호 기록 시각 (epoch millis, `signal_records.timestampMillis`)              |
+| latitude        | 기록 당시 위도 (`signal_records.latitude`)                                   |
+| longitude       | 기록 당시 경도 (`signal_records.longitude`)                                  |
+| rsrp            | LTE 신호 세기 (Reference Signal Received Power) (`signal_records.rsrp`)    |
+| rsrq            | LTE 신호의 품질 (Reference Signal Received Quality) (`signal_records.rsrq`) |
 
 ### example
 
 ```csv
-recordId,sessionId,sessionName,sessionCreatedAt,timestampMillis,latitude,longitude,rsrp,rsrq
-1,1,Test Session A,1761481200000,1761481296731,37.5665,126.9780,-95,-10
-2,1,Test Session A,1761481200000,1761481300000,37.5670,126.9790,-97,-12
-3,2,Test Session B,1761481300000,1761481310000,37.5680,126.9800,-92,-9
+timestampMillis,latitude,longitude,rsrp,rsrq
+1761481200000,1761481296731,37.5665,126.9780,-95,-10
+1761481200000,1761481300000,37.5670,126.9790,-97,-12
+1761481300000,1761481310000,37.5680,126.9800,-92,-9
 ```
 
 ## Usage
