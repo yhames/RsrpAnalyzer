@@ -12,6 +12,7 @@ import com.example.rsrpanalyzer.R
 import com.example.rsrpanalyzer.databinding.FragmentTableViewBinding
 import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel
 import com.example.rsrpanalyzer.viewmodel.CurrentSignalViewModel
+import com.example.rsrpanalyzer.viewmodel.SessionDataViewModel
 
 class TableViewFragment : Fragment(R.layout.fragment_table_view) {
 
@@ -20,6 +21,7 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
 
     private val currentSignalViewModel: CurrentSignalViewModel by activityViewModels()
     private val recordStatusViewModel: RecordStatusViewModel by activityViewModels()
+    private val sessionDataViewModel: SessionDataViewModel by activityViewModels()
 
     private lateinit var signalRecordItemAdapter: SignalRecordItemAdapter
 
@@ -46,39 +48,86 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
     }
 
     private fun observeViewModels() {
-        // 현재 값 업데이트
-        currentSignalViewModel.location.observe(viewLifecycleOwner) { location ->
-            binding.tvLatitude.text = getString(R.string.latitude_value, location.latitude)
-            binding.tvLongitude.text = getString(R.string.longitude_value, location.longitude)
+        // 히스토리 모드 감지
+        sessionDataViewModel.isHistoryMode.observe(viewLifecycleOwner) { isHistoryMode ->
+            if (!isHistoryMode) {
+                // 실시간 모드로 복귀 시 목록 초기화
+                signalRecordItemAdapter.clearRecordItems()
+            }
+        }
 
-            // 녹화 중일 때만 기록 추가
-            if (recordStatusViewModel.isRecording.value == true) {
-                val rsrp = currentSignalViewModel.rsrp.value ?: Int.MIN_VALUE
-                val rsrq = currentSignalViewModel.rsrq.value ?: Int.MIN_VALUE
-                if (rsrp != Int.MIN_VALUE) { // 유효한 신호 값이 있을 때만 기록
-                    val recordItem = SignalRecordItem(
-                        latitude = location.latitude,
-                        longitude = location.longitude,
-                        rsrp = rsrp,
-                        rsrq = rsrq
-                    )
-                    signalRecordItemAdapter.addRecordItem(recordItem)
+        // 세션 기록 데이터 로드
+        sessionDataViewModel.sessionRecords.observe(viewLifecycleOwner) { records ->
+            if (sessionDataViewModel.isHistoryMode.value == true && records.isNotEmpty()) {
+                displaySessionRecords(records)
+            }
+        }
+
+        // 현재 값 업데이트 (실시간 모드일 때만)
+        currentSignalViewModel.location.observe(viewLifecycleOwner) { location ->
+            if (sessionDataViewModel.isHistoryMode.value != true) {
+                binding.tvLatitude.text = getString(R.string.latitude_value, location.latitude)
+                binding.tvLongitude.text = getString(R.string.longitude_value, location.longitude)
+
+                // 녹화 중일 때만 기록 추가
+                if (recordStatusViewModel.isRecording.value == true) {
+                    val rsrp = currentSignalViewModel.rsrp.value ?: Int.MIN_VALUE
+                    val rsrq = currentSignalViewModel.rsrq.value ?: Int.MIN_VALUE
+                    if (rsrp != Int.MIN_VALUE) { // 유효한 신호 값이 있을 때만 기록
+                        val recordItem = SignalRecordItem(
+                            latitude = location.latitude,
+                            longitude = location.longitude,
+                            rsrp = rsrp,
+                            rsrq = rsrq
+                        )
+                        signalRecordItemAdapter.addRecordItem(recordItem)
+                    }
                 }
             }
         }
 
         currentSignalViewModel.rsrp.observe(viewLifecycleOwner) { rsrp ->
-            binding.tvRsrpTable.text = getString(R.string.rsrp_value_simple, rsrp)
+            if (sessionDataViewModel.isHistoryMode.value != true) {
+                binding.tvRsrpTable.text = getString(R.string.rsrp_value_simple, rsrp)
+            }
         }
 
         currentSignalViewModel.rsrq.observe(viewLifecycleOwner) { rsrq ->
-            binding.tvRsrqTable.text = getString(R.string.rsrq_value_simple, rsrq)
+            if (sessionDataViewModel.isHistoryMode.value != true) {
+                binding.tvRsrqTable.text = getString(R.string.rsrq_value_simple, rsrq)
+            }
         }
 
-        // 녹화 상태 변경 시 목록 초기화
+        // 녹화 상태 변경 시 목록 초기화 (실시간 모드일 때만)
         recordStatusViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
-            Log.d("TableViewFragment", "Recording state changed: $isRecording. Clearing records.")
-            signalRecordItemAdapter.clearRecordItems()
+            if (sessionDataViewModel.isHistoryMode.value != true) {
+                Log.d("TableViewFragment", "Recording state changed: $isRecording. Clearing records.")
+                signalRecordItemAdapter.clearRecordItems()
+            }
+        }
+    }
+
+    private fun displaySessionRecords(records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>) {
+        signalRecordItemAdapter.clearRecordItems()
+        
+        // 첫 번째 기록으로 현재 패널 업데이트
+        if (records.isNotEmpty()) {
+            val firstRecord = records.first()
+            binding.tvLatitude.text = getString(R.string.latitude_value, firstRecord.latitude)
+            binding.tvLongitude.text = getString(R.string.longitude_value, firstRecord.longitude)
+            binding.tvRsrpTable.text = getString(R.string.rsrp_value_simple, firstRecord.rsrp)
+            binding.tvRsrqTable.text = getString(R.string.rsrq_value_simple, firstRecord.rsrq)
+        }
+        
+        // 모든 기록을 리스트에 추가 (역순)
+        records.reversed().forEach { record ->
+            val recordItem = SignalRecordItem(
+                latitude = record.latitude,
+                longitude = record.longitude,
+                rsrp = record.rsrp,
+                rsrq = record.rsrq
+            )
+            signalRecordItemAdapter.addRecordItem(recordItem)
         }
     }
 

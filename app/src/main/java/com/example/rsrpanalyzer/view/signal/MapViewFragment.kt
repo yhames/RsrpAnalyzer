@@ -18,6 +18,7 @@ import com.example.rsrpanalyzer.databinding.FragmentMapViewBinding
 import com.example.rsrpanalyzer.model.signal.SignalStrengthHelper
 import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel
 import com.example.rsrpanalyzer.viewmodel.CurrentSignalViewModel
+import com.example.rsrpanalyzer.viewmodel.SessionDataViewModel
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.KakaoMapSdk
@@ -39,6 +40,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
 
     private val currentSignalViewModel: CurrentSignalViewModel by activityViewModels()
     private val recordStatusViewModel: RecordStatusViewModel by activityViewModels()
+    private val sessionDataViewModel: SessionDataViewModel by activityViewModels()
 
     private var kakaoMap: KakaoMap? = null
     private var labelManager: LabelManager? = null
@@ -85,6 +87,33 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     }
 
     private fun observeViewModels() {
+        // 히스토리 모드 감지
+        sessionDataViewModel.isHistoryMode.observe(viewLifecycleOwner) { isHistoryMode ->
+            if (isHistoryMode) {
+                // 실시간 위치 라벨 숨김
+                positionLabel?.let { labelLayer?.remove(it) }
+                positionLabel = null
+                // 기존 녹화 라벨 제거
+                if (recordLabels.isNotEmpty()) {
+                    labelLayer?.remove(*recordLabels.toTypedArray())
+                    recordLabels.clear()
+                }
+            } else {
+                // 실시간 모드로 복귀 시 히스토리 라벨 제거
+                if (recordLabels.isNotEmpty()) {
+                    labelLayer?.remove(*recordLabels.toTypedArray())
+                    recordLabels.clear()
+                }
+            }
+        }
+        
+        // 세션 기록 데이터 로드
+        sessionDataViewModel.sessionRecords.observe(viewLifecycleOwner) { records ->
+            if (sessionDataViewModel.isHistoryMode.value == true && records.isNotEmpty()) {
+                displaySessionRecords(records)
+            }
+        }
+        
         recordStatusViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
             // 녹화 상태가 변경될 때마다, 이전에 기록된 원들을 항상 삭제합니다.
             if (recordLabels.isNotEmpty()) {
@@ -94,17 +123,26 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         }
 
         currentSignalViewModel.location.observe(viewLifecycleOwner) { loc ->
-            if (recordStatusViewModel.isRecording.value == true) {
-                addRecordedLocation(loc)
-            } else {
-                updateCurrentLocation(loc)
+            // 히스토리 모드가 아닐 때만 실시간 데이터 표시
+            if (sessionDataViewModel.isHistoryMode.value != true) {
+                if (recordStatusViewModel.isRecording.value == true) {
+                    addRecordedLocation(loc)
+                } else {
+                    updateCurrentLocation(loc)
+                }
             }
         }
         currentSignalViewModel.rsrp.observe(viewLifecycleOwner) { rsrp ->
-            updateRsrp(rsrp)
+            // 히스토리 모드가 아닐 때만 실시간 데이터 표시
+            if (sessionDataViewModel.isHistoryMode.value != true) {
+                updateRsrp(rsrp)
+            }
         }
         currentSignalViewModel.rsrq.observe(viewLifecycleOwner) { rsrq ->
-            updateRsrq(rsrq)
+            // 히스토리 모드가 아닐 때만 실시간 데이터 표시
+            if (sessionDataViewModel.isHistoryMode.value != true) {
+                updateRsrq(rsrq)
+            }
         }
     }
 
@@ -200,5 +238,53 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         val b = ((color and 0xff) * factor).toInt().coerceIn(0, 255)
         val a = color shr 24 and 0xff
         return (a shl 24) or (r shl 16) or (g shl 8) or b
+    }
+
+    private fun displaySessionRecords(records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>) {
+        if (!isAdded) return
+        val layer = labelLayer ?: return
+        val manager = labelManager ?: return
+        val map = kakaoMap ?: return
+
+        // 기존 라벨 제거
+        if (recordLabels.isNotEmpty()) {
+            layer.remove(*recordLabels.toTypedArray())
+            recordLabels.clear()
+        }
+
+        // 세션 기록을 지도에 표시
+        records.forEach { record ->
+            val position = LatLng.from(record.latitude, record.longitude)
+            
+            // RSRP 기준으로 색상 결정
+            val rsrpLevel = SignalStrengthHelper.getRsrpLevel(record.rsrp)
+            val color = requireContext().getColor(rsrpLevel.color)
+            val bitmap = bitmapCache.getOrPut(color) {
+                createColoredCircleBitmap(color, 40)
+            }
+            val labelStyle = LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
+            val styles = manager.addLabelStyles(LabelStyles.from(labelStyle))
+            val options = LabelOptions.from(position).setStyles(styles)
+            val label = layer.addLabel(options)
+            recordLabels.add(label)
+        }
+
+        // 첫 번째 기록 위치로 카메라 이동
+        if (records.isNotEmpty()) {
+            val firstRecord = records.first()
+            val position = LatLng.from(firstRecord.latitude, firstRecord.longitude)
+            val cameraUpdate = CameraUpdateFactory.newCenterPosition(position)
+            map.moveCamera(cameraUpdate)
+        }
+
+        // 신호 패널 업데이트 (첫 번째 기록 기준)
+        if (records.isNotEmpty()) {
+            val firstRecord = records.first()
+            binding.tvStatus.text = getString(R.string.session_history_viewing)
+            val rsrpLabel = getString(SignalStrengthHelper.getRsrpLevel(firstRecord.rsrp).labelResourceId)
+            binding.tvRsrp.text = getString(R.string.rsrp_value, firstRecord.rsrp, rsrpLabel)
+            val rsrqLabel = getString(SignalStrengthHelper.getRsrqLevel(firstRecord.rsrq).labelResourceId)
+            binding.tvRsrq.text = getString(R.string.rsrq_value, firstRecord.rsrq, rsrqLabel)
+        }
     }
 }

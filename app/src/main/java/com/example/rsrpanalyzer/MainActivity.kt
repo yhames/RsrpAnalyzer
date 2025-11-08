@@ -13,12 +13,13 @@ import androidx.fragment.app.Fragment
 import com.example.rsrpanalyzer.databinding.ActivityMainBinding
 import com.example.rsrpanalyzer.model.location.LocationTracker
 import com.example.rsrpanalyzer.model.signal.SignalMonitor
-import com.example.rsrpanalyzer.view.history.SessionHistoryFragment
+import com.example.rsrpanalyzer.view.history.SessionListDialog
 import com.example.rsrpanalyzer.view.record.RecordControlFragment
 import com.example.rsrpanalyzer.view.signal.MapViewFragment
 import com.example.rsrpanalyzer.view.signal.TableViewFragment
 import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel
 import com.example.rsrpanalyzer.viewmodel.CurrentSignalViewModel
+import com.example.rsrpanalyzer.viewmodel.SessionDataViewModel
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val currentSignalViewModel: CurrentSignalViewModel by viewModels()
     private val recordStatusViewModel: RecordStatusViewModel by viewModels()
+    private val sessionDataViewModel: SessionDataViewModel by viewModels()
 
     private lateinit var locationTracker: LocationTracker
     private lateinit var signalMonitor: SignalMonitor
@@ -33,9 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private val mapViewFragment by lazy { MapViewFragment() }
     private val tableViewFragment by lazy { TableViewFragment() }
-    private val sessionHistoryFragment by lazy { SessionHistoryFragment() }
     private var activeFragment: Fragment = mapViewFragment
-    private var isRealtimeMode = true // true: 실시간 보기, false: 이전 기록 보기
 
     private val requiredPermissions = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -127,23 +127,14 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navigation_map -> {
-                    if (isRealtimeMode) switchFragment(mapViewFragment)
-                }
-                R.id.navigation_data -> {
-                    if (isRealtimeMode) switchFragment(tableViewFragment)
-                }
+                R.id.navigation_map -> switchFragment(mapViewFragment)
+                R.id.navigation_data -> switchFragment(tableViewFragment)
                 R.id.navigation_realtime -> {
-                    if (!isRealtimeMode) {
-                        isRealtimeMode = true
-                        showRealtimeMode()
-                    }
+                    sessionDataViewModel.setHistoryMode(false)
+                    binding.recordControlContainer.visibility = View.VISIBLE
                 }
                 R.id.navigation_history -> {
-                    if (isRealtimeMode) {
-                        isRealtimeMode = false
-                        showHistoryMode()
-                    }
+                    showSessionListDialog()
                 }
             }
             true
@@ -158,39 +149,19 @@ class MainActivity : AppCompatActivity() {
         activeFragment = fragment
     }
 
-    private fun showRealtimeMode() {
-        // RecordControl 표시
-        binding.recordControlContainer.visibility = View.VISIBLE
-        
-        // 현재 Fragment 상태에 따라 Map 또는 Table로 전환
-        val targetFragment = when (binding.bottomNavigation.selectedItemId) {
-            R.id.navigation_data -> tableViewFragment
-            else -> mapViewFragment
+    private fun showSessionListDialog() {
+        val dialog = SessionListDialog.newInstance { sessionItem ->
+            // 세션 선택 시
+            sessionDataViewModel.selectSession(sessionItem)
+            sessionDataViewModel.setHistoryMode(true)
+            
+            // RecordControl 숨김 (이전 기록 보기 모드)
+            binding.recordControlContainer.visibility = View.GONE
+            
+            // 지도보기로 자동 전환
+            binding.bottomNavigation.selectedItemId = R.id.navigation_map
         }
-        
-        supportFragmentManager.beginTransaction().apply {
-            hide(activeFragment)
-            if (!targetFragment.isAdded) {
-                add(R.id.main_fragment_container, targetFragment)
-            }
-            show(targetFragment)
-        }.commit()
-        activeFragment = targetFragment
-    }
-
-    private fun showHistoryMode() {
-        // RecordControl 숨김
-        binding.recordControlContainer.visibility = View.GONE
-        
-        // SessionHistoryFragment로 전환
-        supportFragmentManager.beginTransaction().apply {
-            hide(activeFragment)
-            if (!sessionHistoryFragment.isAdded) {
-                add(R.id.main_fragment_container, sessionHistoryFragment)
-            }
-            show(sessionHistoryFragment)
-        }.commit()
-        activeFragment = sessionHistoryFragment
+        dialog.show(supportFragmentManager, SessionListDialog.TAG)
     }
 
     private fun observeViewModel() {

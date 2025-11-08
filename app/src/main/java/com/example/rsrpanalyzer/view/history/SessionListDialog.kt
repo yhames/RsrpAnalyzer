@@ -1,46 +1,54 @@
 package com.example.rsrpanalyzer.view.history
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import com.example.rsrpanalyzer.R
 import com.example.rsrpanalyzer.data.db.DatabaseProvider
-import com.example.rsrpanalyzer.databinding.FragmentSessionHistoryBinding
+import com.example.rsrpanalyzer.databinding.DialogSessionListBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SessionHistoryFragment : Fragment(R.layout.fragment_session_history) {
+class SessionListDialog : DialogFragment() {
 
-    private var _binding: FragmentSessionHistoryBinding? = null
+    private var _binding: DialogSessionListBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var sessionHistoryAdapter: SessionHistoryAdapter
+    private var onSessionSelected: ((SessionItem) -> Unit)? = null
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        _binding = DialogSessionListBinding.inflate(layoutInflater)
+        
+        setupRecyclerView()
+        loadSessionHistory()
+
+        return MaterialAlertDialogBuilder(requireContext())
+            .setView(binding.root)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSessionHistoryBinding.inflate(inflater, container, false)
+    ): View? {
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setupRecyclerView()
-        loadSessionHistory()
     }
 
     private fun setupRecyclerView() {
         sessionHistoryAdapter = SessionHistoryAdapter { sessionItem ->
-            onSessionClick(sessionItem)
+            onSessionSelected?.invoke(sessionItem)
+            dismiss()
         }
-        binding.rvSessionHistory.adapter = sessionHistoryAdapter
+        binding.rvSessionList.adapter = sessionHistoryAdapter
     }
 
     private fun loadSessionHistory() {
@@ -67,13 +75,22 @@ class SessionHistoryFragment : Fragment(R.layout.fragment_session_history) {
         }
     }
 
-    private fun onSessionClick(sessionItem: SessionItem) {
-        // TODO: Navigate to session detail view
-        // 세션 상세 화면으로 이동 (다음 단계에서 구현)
+    fun setOnSessionSelectedListener(listener: (SessionItem) -> Unit) {
+        onSessionSelected = listener
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        const val TAG = "SessionListDialog"
+        
+        fun newInstance(onSessionSelected: (SessionItem) -> Unit): SessionListDialog {
+            return SessionListDialog().apply {
+                setOnSessionSelectedListener(onSessionSelected)
+            }
+        }
     }
 }

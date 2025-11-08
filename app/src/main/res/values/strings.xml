@@ -22,6 +22,7 @@
     <string name="previous_record_view">이전 기록 보기</string>
 
     <string name="signal_measuring_status">신호 측정 중…</string>
+    <string name="session_history_viewing">이전 기록 보기</string>
     <string name="signal_excellent">매우 좋음</string>
     <string name="signal_good">좋음</string>
     <string name="signal_fair">보통</string>
