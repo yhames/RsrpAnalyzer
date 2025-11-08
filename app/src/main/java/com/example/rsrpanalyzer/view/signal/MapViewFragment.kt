@@ -228,7 +228,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         val baseColor = requireContext().getColor(rsrpLevel.color)
 
         // 반투명 색상으로 변환 (알파값 35%)
-        val alpha = (255 * 0.35).toInt()
+        val alpha = (255 * 0.70).toInt()
         val transparentColor = (alpha shl 24) or (baseColor and 0x00FFFFFF)
 
         val bitmap = bitmapCache.getOrPut(transparentColor) {
