@@ -13,6 +13,7 @@ import java.util.Locale
 
 class SessionHistoryAdapter(
     private val onSessionClick: (SessionItem) -> Unit,
+    private val onSessionDownload: (SessionItem) -> Unit,
     private val onSessionEdit: (SessionItem) -> Unit,
     private val onSessionDelete: (SessionItem) -> Unit
 ) : ListAdapter<SessionItem, SessionHistoryAdapter.SessionViewHolder>(SessionDiffCallback()) {
@@ -23,7 +24,13 @@ class SessionHistoryAdapter(
             parent,
             false
         )
-        return SessionViewHolder(binding, onSessionClick, onSessionEdit, onSessionDelete)
+        return SessionViewHolder(
+            binding,
+            onSessionClick,
+            onSessionDownload,
+            onSessionEdit,
+            onSessionDelete
+        )
     }
 
     override fun onBindViewHolder(holder: SessionViewHolder, position: Int) {
@@ -33,15 +40,16 @@ class SessionHistoryAdapter(
     class SessionViewHolder(
         private val binding: ItemSessionBinding,
         private val onSessionClick: (SessionItem) -> Unit,
+        private val onSessionDownload: (SessionItem) -> Unit,
         private val onSessionEdit: (SessionItem) -> Unit,
         private val onSessionDelete: (SessionItem) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        private fun getDateFormat() = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
         fun bind(item: SessionItem) {
             binding.tvSessionName.text = item.sessionName
-            binding.tvSessionDate.text = dateFormat.format(Date(item.createdAt))
+            binding.tvSessionDate.text = getDateFormat().format(Date(item.createdAt))
             binding.tvRecordCount.text = binding.root.context.getString(
                 R.string.session_record_count,
                 item.recordCount
@@ -50,11 +58,15 @@ class SessionHistoryAdapter(
             binding.sessionInfoContainer.setOnClickListener {
                 onSessionClick(item)
             }
-            
+
+            binding.btnDownload.setOnClickListener {
+                onSessionDownload(item)
+            }
+
             binding.btnEdit.setOnClickListener {
                 onSessionEdit(item)
             }
-            
+
             binding.btnDelete.setOnClickListener {
                 onSessionDelete(item)
             }

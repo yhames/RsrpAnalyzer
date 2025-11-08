@@ -7,19 +7,37 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/session_history_title"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:paddingBottom="16dp"
-        android:textColor="?attr/colorOnSurface" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/session_history_title"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_import_csv"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/session_import_csv"
+            android:textSize="14sp"
+            app:icon="@android:drawable/stat_sys_upload" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_session_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:maxHeight="400dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_session" />
@@ -28,11 +46,11 @@
         android:id="@+id/tv_empty_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/session_history_empty"
-        android:textSize="16sp"
-        android:textColor="?attr/colorOnSurfaceVariant"
         android:gravity="center"
         android:padding="32dp"
+        android:text="@string/session_history_empty"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="16sp"
         android:visibility="gone"
         tools:visibility="visible" />
 

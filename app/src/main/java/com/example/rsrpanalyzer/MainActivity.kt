@@ -133,13 +133,14 @@ class MainActivity : AppCompatActivity() {
                     sessionDataViewModel.setHistoryMode(false)
                     binding.recordControlContainer.visibility = View.VISIBLE
                 }
+
                 R.id.navigation_history -> {
                     showSessionListDialog()
                 }
             }
             true
         }
-        
+
         // 기본적으로 실시간 보기 선택
         binding.bottomNavigation.selectedItemId = R.id.navigation_realtime
     }
@@ -154,10 +155,10 @@ class MainActivity : AppCompatActivity() {
             // 세션 선택 시
             sessionDataViewModel.selectSession(sessionItem)
             sessionDataViewModel.setHistoryMode(true)
-            
+
             // RecordControl 숨김 (이전 기록 보기 모드)
             binding.recordControlContainer.visibility = View.GONE
-            
+
             // 지도보기로 자동 전환
             binding.bottomNavigation.selectedItemId = R.id.navigation_map
         }
@@ -169,7 +170,8 @@ class MainActivity : AppCompatActivity() {
             binding.tvRecordingStatus.visibility = if (isRecording) View.VISIBLE else View.GONE
         }
         recordStatusViewModel.sessionName.observe(this) { sessionName ->
-            binding.tvRecordingStatus.text = getString(R.string.session_recording_status, sessionName)
+            binding.tvRecordingStatus.text =
+                getString(R.string.session_recording_status, sessionName)
         }
     }
 }

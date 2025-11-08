@@ -53,11 +53,12 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
             if (!isHistoryMode) {
                 // 실시간 모드로 복귀 시 목록 초기화
                 signalRecordItemAdapter.clearRecordItems()
-                
+
                 // 현재 값으로 패널 복원
                 currentSignalViewModel.location.value?.let { location ->
                     binding.tvLatitude.text = getString(R.string.latitude_value, location.latitude)
-                    binding.tvLongitude.text = getString(R.string.longitude_value, location.longitude)
+                    binding.tvLongitude.text =
+                        getString(R.string.longitude_value, location.longitude)
                 }
                 currentSignalViewModel.rsrp.value?.let { rsrp ->
                     binding.tvRsrpTable.text = getString(R.string.rsrp_value_simple, rsrp)
@@ -117,7 +118,10 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
         // 녹화 상태 변경 시 목록 초기화 (실시간 모드일 때만)
         recordStatusViewModel.isRecording.observe(viewLifecycleOwner) { isRecording ->
             if (sessionDataViewModel.isHistoryMode.value != true) {
-                Log.d("TableViewFragment", "Recording state changed: $isRecording. Clearing records.")
+                Log.d(
+                    "TableViewFragment",
+                    "Recording state changed: $isRecording. Clearing records."
+                )
                 signalRecordItemAdapter.clearRecordItems()
             }
         }
@@ -125,13 +129,13 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
 
     private fun displaySessionRecords(records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>) {
         signalRecordItemAdapter.clearRecordItems()
-        
+
         // 이전 기록 모드에서는 현재 패널을 placeholder로 표시
         binding.tvLatitude.text = getString(R.string.latitude_placeholder)
         binding.tvLongitude.text = getString(R.string.longitude_placeholder)
         binding.tvRsrpTable.text = getString(R.string.rsrp_placeholder)
         binding.tvRsrqTable.text = getString(R.string.rsrq_placeholder)
-        
+
         // 모든 기록을 리스트에 추가 (역순)
         records.reversed().forEach { record ->
             val recordItem = SignalRecordItem(

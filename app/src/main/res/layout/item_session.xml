@@ -7,15 +7,15 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="2dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="?attr/colorOutline">
+    app:strokeColor="?attr/colorOutline"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:baselineAligned="false">
+        android:padding="16dp">
 
         <LinearLayout
             android:id="@+id/session_info_container"
@@ -28,9 +28,9 @@
                 android:id="@+id/tv_session_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
                 tools:text="Session 1" />
 
             <TextView
@@ -38,8 +38,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="14sp"
                 android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="14sp"
                 tools:text="2025-11-08 14:30:00" />
 
             <TextView
@@ -47,8 +47,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="14sp"
                 android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="14sp"
                 tools:text="기록 수: 150개" />
 
         </LinearLayout>
@@ -56,16 +56,26 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="center_vertical">
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btn_download"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/session_export_csv"
+                android:src="@android:drawable/stat_sys_download"
+                app:tint="?attr/colorPrimary" />
 
             <ImageButton
                 android:id="@+id/btn_edit"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_marginTop="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_edit"
                 android:contentDescription="@string/session_edit"
+                android:src="@android:drawable/ic_menu_edit"
                 app:tint="?attr/colorPrimary" />
 
             <ImageButton
@@ -74,8 +84,8 @@
                 android:layout_height="40dp"
                 android:layout_marginTop="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_delete"
                 android:contentDescription="@string/session_delete"
+                android:src="@android:drawable/ic_menu_delete"
                 app:tint="?attr/colorError" />
 
         </LinearLayout>
