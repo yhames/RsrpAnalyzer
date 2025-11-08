@@ -4,13 +4,17 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
+import androidx.room.Update
 
 @Dao
 interface SignalSessionDao {
     // ✅ 새 세션 추가
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun save(session: SignalSessionEntity): Long
+
+    // ✅ 세션 업데이트
+    @Update
+    suspend fun update(session: SignalSessionEntity)
 
     // ✅ 세션 id로 조회
     @Query("SELECT * FROM signal_sessions WHERE id = :id LIMIT 1")

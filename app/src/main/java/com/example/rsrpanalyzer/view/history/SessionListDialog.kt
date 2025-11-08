@@ -5,10 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
+import com.example.rsrpanalyzer.R
 import com.example.rsrpanalyzer.data.db.DatabaseProvider
+import com.example.rsrpanalyzer.data.db.SignalSessionEntity
 import com.example.rsrpanalyzer.databinding.DialogSessionListBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -44,10 +48,18 @@ class SessionListDialog : DialogFragment() {
     }
 
     private fun setupRecyclerView() {
-        sessionHistoryAdapter = SessionHistoryAdapter { sessionItem ->
-            onSessionSelected?.invoke(sessionItem)
-            dismiss()
-        }
+        sessionHistoryAdapter = SessionHistoryAdapter(
+            onSessionClick = { sessionItem ->
+                onSessionSelected?.invoke(sessionItem)
+                dismiss()
+            },
+            onSessionEdit = { sessionItem ->
+                showEditSessionDialog(sessionItem)
+            },
+            onSessionDelete = { sessionItem ->
+                showDeleteConfirmDialog(sessionItem)
+            }
+        )
         binding.rvSessionList.adapter = sessionHistoryAdapter
     }
 
@@ -77,6 +89,88 @@ class SessionListDialog : DialogFragment() {
 
     fun setOnSessionSelectedListener(listener: (SessionItem) -> Unit) {
         onSessionSelected = listener
+    }
+
+    private fun showEditSessionDialog(sessionItem: SessionItem) {
+        val editText = EditText(requireContext()).apply {
+            setText(sessionItem.sessionName)
+            setSingleLine()
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.session_edit_title)
+            .setView(editText)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val newName = editText.text.toString().trim()
+                if (newName.isEmpty()) {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.session_name_empty_error,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    updateSessionName(sessionItem, newName)
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showDeleteConfirmDialog(sessionItem: SessionItem) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.session_delete_confirm_title)
+            .setMessage(getString(R.string.session_delete_confirm_message, sessionItem.sessionName))
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                deleteSession(sessionItem)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun updateSessionName(sessionItem: SessionItem, newName: String) {
+        lifecycleScope.launch {
+            val database = DatabaseProvider.getDatabase(requireContext())
+            
+            // 중복 이름 체크
+            val existingSession = withContext(Dispatchers.IO) {
+                database.signalSessionDao().findSessionByName(newName)
+            }
+            
+            if (existingSession != null && existingSession.id != sessionItem.id) {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.session_name_duplicate_error,
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@launch
+            }
+
+            // 세션 업데이트
+            withContext(Dispatchers.IO) {
+                val updatedSession = SignalSessionEntity(
+                    id = sessionItem.id,
+                    sessionName = newName,
+                    createdAt = sessionItem.createdAt
+                )
+                database.signalSessionDao().update(updatedSession)
+            }
+
+            // 목록 새로고침
+            loadSessionHistory()
+        }
+    }
+
+    private fun deleteSession(sessionItem: SessionItem) {
+        lifecycleScope.launch {
+            val database = DatabaseProvider.getDatabase(requireContext())
+            
+            withContext(Dispatchers.IO) {
+                database.signalSessionDao().deleteSessionById(sessionItem.id)
+            }
+
+            // 목록 새로고침
+            loadSessionHistory()
+        }
     }
 
     override fun onDestroyView() {

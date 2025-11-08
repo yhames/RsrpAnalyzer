@@ -12,7 +12,9 @@ import java.util.Date
 import java.util.Locale
 
 class SessionHistoryAdapter(
-    private val onSessionClick: (SessionItem) -> Unit
+    private val onSessionClick: (SessionItem) -> Unit,
+    private val onSessionEdit: (SessionItem) -> Unit,
+    private val onSessionDelete: (SessionItem) -> Unit
 ) : ListAdapter<SessionItem, SessionHistoryAdapter.SessionViewHolder>(SessionDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionViewHolder {
@@ -21,7 +23,7 @@ class SessionHistoryAdapter(
             parent,
             false
         )
-        return SessionViewHolder(binding, onSessionClick)
+        return SessionViewHolder(binding, onSessionClick, onSessionEdit, onSessionDelete)
     }
 
     override fun onBindViewHolder(holder: SessionViewHolder, position: Int) {
@@ -30,7 +32,9 @@ class SessionHistoryAdapter(
 
     class SessionViewHolder(
         private val binding: ItemSessionBinding,
-        private val onSessionClick: (SessionItem) -> Unit
+        private val onSessionClick: (SessionItem) -> Unit,
+        private val onSessionEdit: (SessionItem) -> Unit,
+        private val onSessionDelete: (SessionItem) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -43,8 +47,16 @@ class SessionHistoryAdapter(
                 item.recordCount
             )
 
-            binding.root.setOnClickListener {
+            binding.sessionInfoContainer.setOnClickListener {
                 onSessionClick(item)
+            }
+            
+            binding.btnEdit.setOnClickListener {
+                onSessionEdit(item)
+            }
+            
+            binding.btnDelete.setOnClickListener {
+                onSessionDelete(item)
             }
         }
     }
