@@ -80,8 +80,6 @@ rsrpanalyzer/
 │   │   ├── SignalRecordEntity.kt
 │   │   ├── SignalSessionDao.kt
 │   │   └── SignalSessionEntity.kt
-│   ├── exporter
-│   │   └── CsvExporter.kt
 │   ├── model
 │   │   ├── SignalRecord.kt
 │   │   └── SignalSession.kt
@@ -95,16 +93,24 @@ rsrpanalyzer/
 │   └── signal
 │       ├── SignalMonitor.kt
 │       └── SignalStrengthHelper.kt
+├── util
+│   └── CsvHelper.kt
 ├── view
-│   ├── map
-│   │   └── MapVisualizer.kt
-│   ├── navigation
-│   │   └── BottomNavBar.kt
-│   └── record
-│       └── RecordControlFragment.kt
+│   ├── history
+│   │   ├── SessionHistoryAdapter.kt
+│   │   ├── SessionItem.kt
+│   │   └── SessionListDialog.kt
+│   ├── record
+│   │   └── RecordControlFragment.kt
+│   └── signal
+│       ├── MapViewFragment.kt
+│       ├── SignalRecordItem.kt
+│       ├── SignalRecordItemAdapter.kt
+│       └── TableViewFragment.kt
 └── viewmodel
-    ├── RecordViewModel.kt
-    └── SignalViewModel.kt
+    ├── CurrentSignalViewModel.kt
+    ├── RecordStatusViewModel.kt
+    └── SessionDataViewModel.kt
 ```
 
 ## Project Architecture
