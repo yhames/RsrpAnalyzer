@@ -127,7 +127,7 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
         }
     }
 
-    private fun displaySessionRecords(records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>) {
+    private fun displaySessionRecords(records: List<com.example.rsrpanalyzer.persistence.db.SignalRecordEntity>) {
         signalRecordItemAdapter.clearRecordItems()
 
         // 이전 기록 모드에서는 현재 패널을 placeholder로 표시

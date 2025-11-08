@@ -1,4 +1,4 @@
-package com.example.rsrpanalyzer.data.db
+package com.example.rsrpanalyzer.persistence.db
 
 import android.content.Context
 import androidx.room.Room

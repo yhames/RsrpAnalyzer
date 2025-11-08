@@ -1,8 +1,8 @@
 package com.example.rsrpanalyzer.model.record
 
 import android.util.Log
-import com.example.rsrpanalyzer.data.model.SignalRecord
-import com.example.rsrpanalyzer.data.repository.SignalRepository
+import com.example.rsrpanalyzer.persistence.model.SignalRecord
+import com.example.rsrpanalyzer.persistence.repository.SignalRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

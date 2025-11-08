@@ -1,4 +1,4 @@
-package com.example.rsrpanalyzer.data.model
+package com.example.rsrpanalyzer.persistence.model
 
 data class SignalRecord(
     val id: Long = 0L,

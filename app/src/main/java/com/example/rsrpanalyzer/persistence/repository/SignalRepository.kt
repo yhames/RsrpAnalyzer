@@ -1,10 +1,10 @@
-package com.example.rsrpanalyzer.data.repository
+package com.example.rsrpanalyzer.persistence.repository
 
-import com.example.rsrpanalyzer.data.db.SignalRecordDao
-import com.example.rsrpanalyzer.data.db.SignalRecordEntity
-import com.example.rsrpanalyzer.data.db.SignalSessionDao
-import com.example.rsrpanalyzer.data.db.SignalSessionEntity
-import com.example.rsrpanalyzer.data.model.SignalRecord
+import com.example.rsrpanalyzer.persistence.db.SignalRecordDao
+import com.example.rsrpanalyzer.persistence.db.SignalRecordEntity
+import com.example.rsrpanalyzer.persistence.db.SignalSessionDao
+import com.example.rsrpanalyzer.persistence.db.SignalSessionEntity
+import com.example.rsrpanalyzer.persistence.model.SignalRecord
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

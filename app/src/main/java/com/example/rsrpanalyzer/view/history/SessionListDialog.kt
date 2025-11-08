@@ -14,10 +14,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.example.rsrpanalyzer.R
-import com.example.rsrpanalyzer.data.db.DatabaseProvider
-import com.example.rsrpanalyzer.data.db.SignalSessionEntity
+import com.example.rsrpanalyzer.persistence.db.DatabaseProvider
+import com.example.rsrpanalyzer.persistence.db.SignalSessionEntity
 import com.example.rsrpanalyzer.databinding.DialogSessionListBinding
-import com.example.rsrpanalyzer.util.CsvHelper
+import com.example.rsrpanalyzer.persistence.util.CsvHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -285,7 +285,7 @@ class SessionListDialog : DialogFragment() {
         }
     }
 
-    private fun showSessionNameInputDialog(records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>) {
+    private fun showSessionNameInputDialog(records: List<com.example.rsrpanalyzer.persistence.db.SignalRecordEntity>) {
         val defaultName = getString(
             R.string.session_import_default_name,
             formatDateForFilename(System.currentTimeMillis())
@@ -316,7 +316,7 @@ class SessionListDialog : DialogFragment() {
 
     private fun saveImportedSession(
         sessionName: String,
-        records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>
+        records: List<com.example.rsrpanalyzer.persistence.db.SignalRecordEntity>
     ) {
         lifecycleScope.launch {
             try {

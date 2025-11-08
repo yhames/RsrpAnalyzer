@@ -10,9 +10,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.rsrpanalyzer.R
-import com.example.rsrpanalyzer.data.db.DatabaseProvider
-import com.example.rsrpanalyzer.data.model.SignalRecord
-import com.example.rsrpanalyzer.data.repository.SignalRepository
+import com.example.rsrpanalyzer.persistence.db.DatabaseProvider
+import com.example.rsrpanalyzer.persistence.model.SignalRecord
+import com.example.rsrpanalyzer.persistence.repository.SignalRepository
 import com.example.rsrpanalyzer.databinding.FragmentRecordControlBinding
 import com.example.rsrpanalyzer.model.record.RecordManager
 import com.example.rsrpanalyzer.viewmodel.RecordStatusViewModel

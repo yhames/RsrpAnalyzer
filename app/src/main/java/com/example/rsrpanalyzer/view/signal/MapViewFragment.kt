@@ -264,7 +264,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         return (a shl 24) or (r shl 16) or (g shl 8) or b
     }
 
-    private fun displaySessionRecords(records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>) {
+    private fun displaySessionRecords(records: List<com.example.rsrpanalyzer.persistence.db.SignalRecordEntity>) {
         if (!isAdded) return
         val map = kakaoMap ?: return
 
@@ -284,7 +284,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     }
 
     private fun drawHeatmapCircles(
-        records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>,
+        records: List<com.example.rsrpanalyzer.persistence.db.SignalRecordEntity>,
         map: KakaoMap
     ) {
         val layer = labelLayer ?: return

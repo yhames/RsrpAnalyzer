@@ -1,6 +1,6 @@
-package com.example.rsrpanalyzer.util
+package com.example.rsrpanalyzer.persistence.util
 
-import com.example.rsrpanalyzer.data.db.SignalRecordEntity
+import com.example.rsrpanalyzer.persistence.db.SignalRecordEntity
 import java.io.InputStream
 import java.io.OutputStream
 import java.text.SimpleDateFormat
