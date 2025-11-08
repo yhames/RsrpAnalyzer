@@ -223,9 +223,14 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
 
     private fun createRsrpLabelStyle(): LabelStyle {
         val rsrpLevel = SignalStrengthHelper.getRsrpLevel(currentRsrp.get())
-        val color = requireContext().getColor(rsrpLevel.color)
-        val bitmap = bitmapCache.getOrPut(color) {
-            createColoredCircleBitmap(color, 40)
+        val baseColor = requireContext().getColor(rsrpLevel.color)
+        
+        // 반투명 색상으로 변환 (알파값 35%)
+        val alpha = (255 * 0.35).toInt()
+        val transparentColor = (alpha shl 24) or (baseColor and 0x00FFFFFF)
+        
+        val bitmap = bitmapCache.getOrPut(transparentColor) {
+            createColoredCircleBitmap(transparentColor, 50, 1.0f)
         }
         return LabelStyle.from(bitmap).setAnchorPoint(0.5f, 0.5f)
     }
