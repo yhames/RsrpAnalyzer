@@ -53,6 +53,22 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
             if (!isHistoryMode) {
                 // 실시간 모드로 복귀 시 목록 초기화
                 signalRecordItemAdapter.clearRecordItems()
+                
+                // 현재 값으로 패널 복원
+                currentSignalViewModel.location.value?.let { location ->
+                    binding.tvLatitude.text = getString(R.string.latitude_value, location.latitude)
+                    binding.tvLongitude.text = getString(R.string.longitude_value, location.longitude)
+                }
+                currentSignalViewModel.rsrp.value?.let { rsrp ->
+                    binding.tvRsrpTable.text = getString(R.string.rsrp_value_simple, rsrp)
+                } ?: run {
+                    binding.tvRsrpTable.text = getString(R.string.rsrp_placeholder)
+                }
+                currentSignalViewModel.rsrq.value?.let { rsrq ->
+                    binding.tvRsrqTable.text = getString(R.string.rsrq_value_simple, rsrq)
+                } ?: run {
+                    binding.tvRsrqTable.text = getString(R.string.rsrq_placeholder)
+                }
             }
         }
 
@@ -110,14 +126,11 @@ class TableViewFragment : Fragment(R.layout.fragment_table_view) {
     private fun displaySessionRecords(records: List<com.example.rsrpanalyzer.data.db.SignalRecordEntity>) {
         signalRecordItemAdapter.clearRecordItems()
         
-        // 첫 번째 기록으로 현재 패널 업데이트
-        if (records.isNotEmpty()) {
-            val firstRecord = records.first()
-            binding.tvLatitude.text = getString(R.string.latitude_value, firstRecord.latitude)
-            binding.tvLongitude.text = getString(R.string.longitude_value, firstRecord.longitude)
-            binding.tvRsrpTable.text = getString(R.string.rsrp_value_simple, firstRecord.rsrp)
-            binding.tvRsrqTable.text = getString(R.string.rsrq_value_simple, firstRecord.rsrq)
-        }
+        // 이전 기록 모드에서는 현재 패널을 placeholder로 표시
+        binding.tvLatitude.text = getString(R.string.latitude_placeholder)
+        binding.tvLongitude.text = getString(R.string.longitude_placeholder)
+        binding.tvRsrpTable.text = getString(R.string.rsrp_placeholder)
+        binding.tvRsrqTable.text = getString(R.string.rsrq_placeholder)
         
         // 모든 기록을 리스트에 추가 (역순)
         records.reversed().forEach { record ->

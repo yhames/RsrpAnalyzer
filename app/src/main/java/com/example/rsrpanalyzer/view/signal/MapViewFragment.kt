@@ -99,10 +99,23 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
                     recordLabels.clear()
                 }
             } else {
-                // 실시간 모드로 복귀 시 히스토리 라벨 제거
+                // 실시간 모드로 복귀
+                binding.tvStatus.text = getString(R.string.signal_measuring_status)
+                
+                // 히스토리 라벨 제거
                 if (recordLabels.isNotEmpty()) {
                     labelLayer?.remove(*recordLabels.toTypedArray())
                     recordLabels.clear()
+                }
+                
+                // 현재 신호 값 복원
+                currentSignalViewModel.rsrp.value?.let { rsrp ->
+                    val rsrpLabel = getString(SignalStrengthHelper.getRsrpLevel(rsrp).labelResourceId)
+                    binding.tvRsrp.text = getString(R.string.rsrp_value, rsrp, rsrpLabel)
+                }
+                currentSignalViewModel.rsrq.value?.let { rsrq ->
+                    val rsrqLabel = getString(SignalStrengthHelper.getRsrqLevel(rsrq).labelResourceId)
+                    binding.tvRsrq.text = getString(R.string.rsrq_value, rsrq, rsrqLabel)
                 }
             }
         }
@@ -277,14 +290,9 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             map.moveCamera(cameraUpdate)
         }
 
-        // 신호 패널 업데이트 (첫 번째 기록 기준)
-        if (records.isNotEmpty()) {
-            val firstRecord = records.first()
-            binding.tvStatus.text = getString(R.string.session_history_viewing)
-            val rsrpLabel = getString(SignalStrengthHelper.getRsrpLevel(firstRecord.rsrp).labelResourceId)
-            binding.tvRsrp.text = getString(R.string.rsrp_value, firstRecord.rsrp, rsrpLabel)
-            val rsrqLabel = getString(SignalStrengthHelper.getRsrqLevel(firstRecord.rsrq).labelResourceId)
-            binding.tvRsrq.text = getString(R.string.rsrq_value, firstRecord.rsrq, rsrqLabel)
-        }
+        // 신호 패널 업데이트 - 이전 기록 모드이므로 placeholder 표시
+        binding.tvStatus.text = getString(R.string.session_history_viewing)
+        binding.tvRsrp.text = getString(R.string.rsrp_value_placeholder)
+        binding.tvRsrq.text = getString(R.string.rsrq_value_placeholder)
     }
 }
